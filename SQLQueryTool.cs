@@ -18,8 +18,9 @@ namespace SqlQueryTool
 		private int Settings_MinimumRowCount = 0;
 
 		private ConnectionData currentConnectionData;
-		private List<TableInfo> tableNames;
-		private List<StoredProc> procNames;
+		private List<TableInfo> tables;
+		private List<StoredProc> procs;
+		private List<View> views;
 
 		public SQLQueryTool()
 		{
@@ -28,12 +29,7 @@ namespace SqlQueryTool
 			ToggleCurrentQueryControls(tabQueries.TabPages.Count > 0);
 		}
 
-		private void AddNewQueryPage(string queryText)
-		{
-			AddNewQueryPage(queryText, String.Empty);
-		}
-
-		private void AddNewQueryPage(string queryText, string tabName)
+		private void AddNewQueryPage(string queryText, string tabName = "")
 		{
 			TabPage tpQueryPage = new TabPage();
 			if (String.IsNullOrEmpty(tabName)) {
@@ -78,6 +74,7 @@ namespace SqlQueryTool
 			dgResults.SelectionChanged += new EventHandler(dgResults_SelectionChanged);
 			dgResults.KeyDown += new KeyEventHandler(dgResults_KeyDown);
 			dgResults.PreviewKeyDown += new PreviewKeyDownEventHandler(dgResults_PreviewKeyDown);
+			dgResults.CellMouseDown += dgResults_CellMouseDown;
 			dgResults.DataError += dgResults_DataError;
 
 			splQuery.Panel1.Controls.Add(txtQueryText);
@@ -90,6 +87,27 @@ namespace SqlQueryTool
 			tabQueries.SelectedTab = tpQueryPage;
 
 			ToggleCurrentQueryControls(tabQueries.TabPages.Count > 0);
+		}
+
+		void dgResults_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+		{
+			if (Control.ModifierKeys == Keys.Alt) {
+				var dataGridView = sender as DataGridView;
+				var selectedCells = dataGridView.SelectedCells.Cast<DataGridViewCell>();
+
+				if (selectedCells.Count() == 0) {
+					return;
+				}
+				if (!AreCellsInSameColumn(selectedCells)) {
+					return;
+				}
+
+				string columnName = selectedCells.First().OwningColumn.Name;
+				bool useQuotes = UseQuotesForCellValues(selectedCells);
+				var dragAndDropValues = selectedCells.OrderBy(c => c.RowIndex).Select(c => new DragDropCellValue() { ColumnName = columnName, Value = c.FormattedValue.ToString(), SqlFormattedValue = String.Format("{0}{1}{0}", useQuotes ? "'" : "", c.FormattedValue) }).ToList();
+				
+				dataGridView.DoDragDrop(dragAndDropValues, DragDropEffects.Copy);
+			}
 		}
 
 		private void ToggleDatagridHeaderCopy(DataGridView datagrid)
@@ -108,19 +126,34 @@ namespace SqlQueryTool
 				return;
 			}
 
-			int columnIndex = selectedCells.First().ColumnIndex;
-			if (selectedCells.Any(c => c.ColumnIndex != columnIndex)) {
+			if (!AreCellsInSameColumn(selectedCells)) {
 				return;
 			}
 
-			Type columnType = selectedCells.First().ValueType;
-			bool useQuotes = false;
-			if (columnType.ToString() == "System.String" || columnType.ToString() == "System.DateTime") {
-				useQuotes = true;
-			}
-
+			bool useQuotes = UseQuotesForCellValues(selectedCells);
 			string result = String.Join(", ", selectedCells.OrderBy(c => c.RowIndex).Select(c => String.Format("{0}{1}{0}", useQuotes ? "'" : "", c.FormattedValue)).ToArray());
 			System.Windows.Forms.Clipboard.SetDataObject(result);
+		}
+
+		private bool AreCellsInSameColumn(IEnumerable<DataGridViewCell> selectedCells)
+		{
+			int columnIndex = selectedCells.First().ColumnIndex;
+			if (selectedCells.Any(c => c.ColumnIndex != columnIndex)) {
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool UseQuotesForCellValues(IEnumerable<DataGridViewCell> selectedCells)
+		{
+			Type columnType = selectedCells.First().ValueType;
+
+			if (columnType.ToString() == "System.String" || columnType.ToString() == "System.DateTime" || columnType.ToString() == "System.Guid") {
+				return true;
+			}
+
+			return false;
 		}
 
 		private string FormatSqlQuery(string queryText)
@@ -149,13 +182,14 @@ namespace SqlQueryTool
 
 		private void FillDatabaseObjects(SqlConnection conn)
 		{
-			tableNames = new List<TableInfo>();
-			procNames = new List<StoredProc>();
+			tables = new List<TableInfo>();
+			procs = new List<StoredProc>();
+			views = new List<View>();
 
 			SqlCommand cmd = new SqlCommand("SELECT LOWER(name) FROM [sysobjects] WHERE xtype = 'u' AND uid = 1 ORDER BY name", conn);
 			using (SqlDataReader rdr = cmd.ExecuteReader()) {
 				while (rdr.Read()) {
-					tableNames.Add(new TableInfo() { Name = rdr.GetString(0), RowCount = Int32.MaxValue });
+					tables.Add(new TableInfo() { Name = rdr.GetString(0), RowCount = Int32.MaxValue });
 				}
 			}
 
@@ -163,12 +197,19 @@ namespace SqlQueryTool
 				cmd.CommandText = "SELECT LOWER(so.name), LOWER(sc.text) FROM sysobjects so JOIN syscomments sc ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 ORDER BY so.name";
 				using (SqlDataReader rdr = cmd.ExecuteReader()) {
 					while (rdr.Read()) {
-						procNames.Add(new StoredProc() { Name = rdr.GetString(0), Content = rdr.GetString(1) });
+						procs.Add(new StoredProc() { Name = rdr.GetString(0), Content = rdr.GetString(1) });
 					}
 				}
 			}
 			catch (Exception) {
 				MessageBox.Show("Probleem SP-de laadimisega", "Hoiatus", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+			}
+
+			cmd.CommandText = "SELECT o.name, m.definition FROM sys.objects o JOIN sys.sql_modules m ON (m.object_id = o.object_id) WHERE o.type = 'V' ORDER BY o.name";
+			using (var rdr = cmd.ExecuteReader()) {
+				while (rdr.Read()) {
+					views.Add(new View() { Name = rdr.GetString(0), Definition = rdr.GetString(1) });
+				}
 			}
 
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
@@ -184,7 +225,7 @@ namespace SqlQueryTool
 					var tableName = rdr.GetString(0);
 					var rowCount = rdr.GetInt64(1);
 
-					tableNames.SingleOrDefault(t => t.Name == tableName).RowCount = rowCount;
+					tables.SingleOrDefault(t => t.Name == tableName).RowCount = rowCount;
 				}
 			}
 		}
@@ -194,22 +235,27 @@ namespace SqlQueryTool
 			trvDatabaseObjects.Nodes.Clear();
 			trvDatabaseObjects.Nodes.Add("Tables", "Tabelid");
 			trvDatabaseObjects.Nodes.Add("Procs", "Protseduurid");
+			trvDatabaseObjects.Nodes.Add("Views", "Vaated");
 
 			if (filterText == EMPTY_SEARCHBOX_TEXT) {
 				filterText = String.Empty;
 			}
 			filterText = filterText.ToLower();
 
-			foreach (var tableInfo in tableNames.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
+			foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
 				trvDatabaseObjects.Nodes["Tables"].Nodes.Add(tableInfo.Name, tableInfo.Name);
 			}
-			foreach (var proc in procNames.Where(p => p.Name.Contains(filterText) || (chkSearchSPContents.Checked && p.Content.Contains(filterText))).Select(p => p)) {
+			foreach (var proc in procs.Where(p => p.Name.Contains(filterText) || (chkSearchSPContents.Checked && p.Content.Contains(filterText)))) {
 				trvDatabaseObjects.Nodes["Procs"].Nodes.Add(proc.Name, proc.Name);
+			}
+			foreach (var view in views.Where(v => v.Name.Contains(filterText) || (chkSearchSPContents.Checked && v.Definition.Contains(filterText)))) {
+				trvDatabaseObjects.Nodes["Views"].Nodes.Add(view.Name, view.Name);
 			}
 
 			if (!String.IsNullOrEmpty(filterText)) {
 				trvDatabaseObjects.Nodes["Tables"].Expand();
 				trvDatabaseObjects.Nodes["Procs"].Expand();
+				trvDatabaseObjects.Nodes["Views"].Expand();
 			}
 
 			trvDatabaseObjects.SelectedNode = trvDatabaseObjects.Nodes["Tables"];
@@ -375,18 +421,26 @@ namespace SqlQueryTool
 			}
 		}
 
-		private void BuildSelectQueryTabPage(string tableName, TableSelectLimit selectLimit)
+		private void BuildSelectQueryTabPage(string tableName, TableSelectLimit selectLimit, string whereClause = "")
 		{
 			Table table = new Table(tableName, currentConnectionData);
 			StringBuilder queryText = new StringBuilder("SELECT ");
 			if (selectLimit != TableSelectLimit.None) {
 				queryText.Append("TOP 100 ");
 			}
-			foreach (Column col in table.Columns) {
-				queryText.AppendFormat("{0}\t{1}, ", Environment.NewLine, col.Name); ;
+			if (table.Columns.Count() > 0) {
+				foreach (Column col in table.Columns) {
+					queryText.AppendFormat("{0}\t{1}, ", Environment.NewLine, col.Name);
+				}
+				queryText.Remove(queryText.Length - 2, 2);
 			}
-			queryText.Remove(queryText.Length - 2, 2);
+			else { // for views
+				queryText.AppendFormat("{0}\t*", Environment.NewLine);
+			}
 			queryText.AppendFormat("{0}FROM{0}\t{1}", Environment.NewLine, tableName);
+			if (!String.IsNullOrEmpty(whereClause)) {
+				queryText.AppendFormat("{0}WHERE{0}\t{1}", Environment.NewLine, whereClause);
+			}
 			if (selectLimit == TableSelectLimit.LimitBottom) {
 				queryText.AppendFormat("{0}ORDER BY", Environment.NewLine);
 				if (table.Columns.IdentityColumn != null) {
@@ -402,12 +456,12 @@ namespace SqlQueryTool
 
 		private void BuildStoredProcTabPage(string procName)
 		{
-			procName = procName.Replace("'", "''");
-			using (SqlConnection conn = Helper.OpenConnection(currentConnectionData)) {
-				SqlCommand cmd = new SqlCommand(String.Format(@"SELECT sc.text FROM syscomments sc JOIN sysobjects so ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 AND so.name = '{0}'", procName), conn);
+			AddNewQueryPage(procs.Single(p => p.Name == procName).Content, procName);
+		}
 
-				AddNewQueryPage((string)cmd.ExecuteScalar(), procName);
-			}
+		private void BuildViewTabPage(string viewName)
+		{
+			AddNewQueryPage(views.Single(v => v.Name == viewName).Definition, viewName);
 		}
 
 		private void CloseQuery(TabPage targetTab)
@@ -455,14 +509,14 @@ namespace SqlQueryTool
 
 		private void HideEmptyTables()
 		{
-			if (Settings_MinimumRowCount > 0 && tableNames.All(t => t.RowCount == Int32.MaxValue)) {
+			if (Settings_MinimumRowCount > 0 && tables.All(t => t.RowCount == Int32.MaxValue)) {
 				using (SqlConnection conn = Helper.OpenConnection(currentConnectionData)) {
 					AddRowCountsToTableInfos(conn);
 				}
 			}
 
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
-			lblStatusbarInfo.Text = String.Format("Näitan {0} tabelit {1}st", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tableNames.Count);
+			lblStatusbarInfo.Text = String.Format("Näitan {0} tabelit {1}st", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count);
 		}
 
 		#region EventHandlers
@@ -545,6 +599,9 @@ namespace SqlQueryTool
 				}
 				else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Procs") {
 					BuildStoredProcTabPage(trvDatabaseObjects.SelectedNode.Name);
+				}
+				else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Views") {
+					BuildSelectQueryTabPage(trvDatabaseObjects.SelectedNode.Name, TableSelectLimit.None);
 				}
 			}
 		}
@@ -633,11 +690,19 @@ namespace SqlQueryTool
 					else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Procs") {
 						cmnStoredProcCommands.Show((Control)sender, new Point(e.X, e.Y));
 					}
+					else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Views") {
+						cmnViewCommands.Show((Control)sender, new Point(e.X, e.Y));
+					}
 				}
 				else if (trvDatabaseObjects.SelectedNode.Name == "Tables") {
 					cmnTableCommandsGlobal.Show((Control)sender, new Point(e.X, e.Y));
 				}
 			}
+		}
+
+		private void mniShowViewDefinition_Click(object sender, EventArgs e)
+		{
+			BuildViewTabPage(trvDatabaseObjects.SelectedNode.Name);
 		}
 
 		private void mniCreateSelectQuery_Click(object sender, EventArgs e)
@@ -707,7 +772,7 @@ namespace SqlQueryTool
 
 		private void mniShowTableRowCounts_Click(object sender, EventArgs e)
 		{
-			AddNewQueryPage(String.Format("SELECT {0}\tt.name \"Tabel\",{0}\tp.rows \"Ridasid\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine));
+			AddNewQueryPage(String.Format("SELECT {0}\tt.name \"Tabel\",{0}\tp.rows \"Ridasid\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine), "Table row counts");
 		}
 
 		private void mniHideEmptyTables_Click(object sender, EventArgs e)
@@ -720,7 +785,61 @@ namespace SqlQueryTool
 			HideEmptyTables();
 		}
 
+		private void mniFindColumns_Click(object sender, EventArgs e)
+		{
+			AddNewQueryPage(String.Format("SELECT {0}\ttables.name TableName, {0}\tcolumns.name ColumnName, {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')'{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE '%xxx%' {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine), "Find columns…");
+		}
+
+		private void txtSearch_DragEnter(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
+				e.Effect = DragDropEffects.Copy;
+			}
+			else {
+				e.Effect = DragDropEffects.None;
+			}
+		}
+
+		private void txtSearch_DragDrop(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.Text)) {
+				txtSearch.Text = e.Data.GetData(DataFormats.Text).ToString();
+			}
+			if (e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
+				var values = e.Data.GetData(typeof(List<DragDropCellValue>)) as List<DragDropCellValue>;
+				txtSearch.Text = values.First().Value;
+			}
+		}
+
+		private void trvDatabaseObjects_DragOver(object sender, DragEventArgs e)
+		{
+			var node = GetDatabaseObjectsHoverNode(e.X, e.Y);
+
+			if (node != null && node.Parent != null && node.Parent.Name == "Tables" && e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
+				e.Effect = DragDropEffects.Copy;
+			}
+			else {
+				e.Effect = DragDropEffects.None;
+			}
+		}
+
+		private void trvDatabaseObjects_DragDrop(object sender, DragEventArgs e)
+		{
+			var node = GetDatabaseObjectsHoverNode(e.X, e.Y);
+
+			var values = e.Data.GetData(typeof(List<DragDropCellValue>)) as List<DragDropCellValue>;
+			BuildSelectQueryTabPage(node.Name, TableSelectLimit.None, String.Format("{0} IN ({1})", values.First().ColumnName, String.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray())));
+		}
+
 		#endregion
+
+		private TreeNode GetDatabaseObjectsHoverNode(int x, int y)
+		{
+			var pos = trvDatabaseObjects.PointToClient(new Point(x, y));
+			var hit = trvDatabaseObjects.HitTest(pos);
+
+			return hit.Node;
+		}
 
 		enum TableSelectLimit
 		{
@@ -735,11 +854,23 @@ namespace SqlQueryTool
 			public string Content { get; set; }
 		}
 
+		struct View
+		{
+			public string Name { get; set; }
+			public string Definition { get; set; }
+		}
+
 		class TableInfo
 		{
 			public string Name { get; set; }
 			public long RowCount { get; set; }
 		}
 
+		class DragDropCellValue
+		{
+			public string ColumnName { get; set; }
+			public string Value { get; set; }
+			public string SqlFormattedValue { get; set; }
+		}
 	}
 }

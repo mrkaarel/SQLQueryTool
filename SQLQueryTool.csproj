@@ -53,6 +53,9 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ScintillaNet">
       <HintPath>External libraries\ScintillaNet.dll</HintPath>
@@ -152,9 +155,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="database.ico" />
+    <Content Include="External libraries\SciLexer.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="External libraries\ScintillaNet.dll" />
     <Content Include="QueryTool.ico" />
+    <Content Include="Resources\find.png" />
     <Content Include="Resources\key.png" />
+    <Content Include="Resources\script.png" />
+    <Content Include="Resources\script_code.png" />
     <Content Include="Resources\table_lightning.png" />
     <None Include="Resources\page_copy.png" />
     <None Include="Resources\key_add.png" />
