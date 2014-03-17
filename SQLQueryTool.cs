@@ -194,10 +194,16 @@ namespace SqlQueryTool
 			}
 
 			try {
-				cmd.CommandText = "SELECT LOWER(so.name), LOWER(sc.text) FROM sysobjects so JOIN syscomments sc ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 ORDER BY so.name";
+				cmd.CommandText = "SELECT LOWER(so.name), sc.text FROM sysobjects so JOIN syscomments sc ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 ORDER BY so.name, sc.colid";
 				using (SqlDataReader rdr = cmd.ExecuteReader()) {
 					while (rdr.Read()) {
-						procs.Add(new StoredProc() { Name = rdr.GetString(0), Content = rdr.GetString(1) });
+						string procName = rdr.GetString(0);
+						var proc = procs.SingleOrDefault(p => p.Name == procName);
+						if (proc == null) {
+							proc = new StoredProc() { Name = procName, Content = "" };
+							procs.Add(proc);
+						}
+						proc.Content += rdr.GetString(1);
 					}
 				}
 			}
@@ -232,30 +238,36 @@ namespace SqlQueryTool
 
 		private void BuildVisibleDatabaseObjectList(string filterText)
 		{
-			trvDatabaseObjects.Nodes.Clear();
-			trvDatabaseObjects.Nodes.Add("Tables", "Tabelid");
-			trvDatabaseObjects.Nodes.Add("Procs", "Protseduurid");
-			trvDatabaseObjects.Nodes.Add("Views", "Vaated");
-
 			if (filterText == EMPTY_SEARCHBOX_TEXT) {
 				filterText = String.Empty;
 			}
 			filterText = filterText.ToLower();
 
-			foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
-				trvDatabaseObjects.Nodes["Tables"].Nodes.Add(tableInfo.Name, tableInfo.Name);
+			trvDatabaseObjects.Nodes.Clear();
+
+			if (tables.Count > 0) {
+				trvDatabaseObjects.Nodes.Add("Tables", "Tabelid");
+				foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
+					trvDatabaseObjects.Nodes["Tables"].Nodes.Add(tableInfo.Name, tableInfo.Name);
+				}
 			}
-			foreach (var proc in procs.Where(p => p.Name.Contains(filterText) || (chkSearchSPContents.Checked && p.Content.Contains(filterText)))) {
-				trvDatabaseObjects.Nodes["Procs"].Nodes.Add(proc.Name, proc.Name);
+
+			if (procs.Count > 0) {
+				trvDatabaseObjects.Nodes.Add("Procs", "Protseduurid");
+				foreach (var proc in procs.Where(p => p.Name.Contains(filterText) || (chkSearchSPContents.Checked && p.Content.Contains(filterText)))) {
+					trvDatabaseObjects.Nodes["Procs"].Nodes.Add(proc.Name, proc.Name);
+				}
 			}
-			foreach (var view in views.Where(v => v.Name.Contains(filterText) || (chkSearchSPContents.Checked && v.Definition.Contains(filterText)))) {
-				trvDatabaseObjects.Nodes["Views"].Nodes.Add(view.Name, view.Name);
+
+			if (views.Count > 0) {
+				trvDatabaseObjects.Nodes.Add("Views", "Vaated");
+				foreach (var view in views.Where(v => v.Name.Contains(filterText) || (chkSearchSPContents.Checked && v.Definition.Contains(filterText)))) {
+					trvDatabaseObjects.Nodes["Views"].Nodes.Add(view.Name, view.Name);
+				}
 			}
 
 			if (!String.IsNullOrEmpty(filterText)) {
-				trvDatabaseObjects.Nodes["Tables"].Expand();
-				trvDatabaseObjects.Nodes["Procs"].Expand();
-				trvDatabaseObjects.Nodes["Views"].Expand();
+				trvDatabaseObjects.Nodes.Cast<TreeNode>().Where(n => n.Parent == null).ToList().ForEach(n => n.Expand());
 			}
 
 			trvDatabaseObjects.SelectedNode = trvDatabaseObjects.Nodes["Tables"];
@@ -848,7 +860,7 @@ namespace SqlQueryTool
 			LimitBottom,
 		}
 
-		struct StoredProc
+		class StoredProc
 		{
 			public string Name { get; set; }
 			public string Content { get; set; }
