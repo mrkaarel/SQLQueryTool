@@ -667,7 +667,8 @@ namespace SqlQueryTool
 
 		private void txtSearch_TextChanged(object sender, EventArgs e)
 		{
-			BuildVisibleDatabaseObjectList(txtSearch.Text);
+			searchTimer.Stop();
+			searchTimer.Start();
 			ToggleFieldAppearance(txtSearch);
 		}
 
@@ -841,6 +842,12 @@ namespace SqlQueryTool
 
 			var values = e.Data.GetData(typeof(List<DragDropCellValue>)) as List<DragDropCellValue>;
 			BuildSelectQueryTabPage(node.Name, TableSelectLimit.None, String.Format("{0} IN ({1})", values.First().ColumnName, String.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray())));
+		}
+
+		private void searchTimer_Tick(object sender, EventArgs e)
+		{
+			searchTimer.Stop();
+			BuildVisibleDatabaseObjectList(txtSearch.Text);
 		}
 
 		#endregion

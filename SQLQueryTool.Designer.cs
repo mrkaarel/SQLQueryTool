@@ -29,8 +29,8 @@ namespace SqlQueryTool
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLQueryTool));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.lblStatusbarInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -38,6 +38,7 @@ namespace SqlQueryTool
 			this.grpDatabaseObjects = new System.Windows.Forms.GroupBox();
 			this.splDatabaseObjects = new System.Windows.Forms.SplitContainer();
 			this.chkSearchSPContents = new System.Windows.Forms.CheckBox();
+			this.btnRefresh = new System.Windows.Forms.Button();
 			this.txtSearch = new System.Windows.Forms.TextBox();
 			this.trvDatabaseObjects = new System.Windows.Forms.TreeView();
 			this.lblTableFieldsTitle = new System.Windows.Forms.Label();
@@ -46,23 +47,17 @@ namespace SqlQueryTool
 			this.colInfo = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.colDescription = new System.Windows.Forms.DataGridViewImageColumn();
 			this.pnlConnection = new System.Windows.Forms.GroupBox();
+			this.btnConnect = new System.Windows.Forms.Button();
+			this.btnAddConnection = new System.Windows.Forms.Button();
+			this.btnDeleteSelectedConnection = new System.Windows.Forms.Button();
 			this.selPreviousConnections = new System.Windows.Forms.ComboBox();
+			this.btnDeleteQuery = new System.Windows.Forms.Button();
+			this.btnAddQuery = new System.Windows.Forms.Button();
+			this.btnRunQuery = new System.Windows.Forms.Button();
 			this.grpQueries = new System.Windows.Forms.GroupBox();
 			this.tabQueries = new System.Windows.Forms.TabControl();
 			this.appImages = new System.Windows.Forms.ImageList(this.components);
 			this.cmnTableCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.cmnTabpage = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.cmnStoredProcCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.cmnTableCommandsGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.mniShowViewDefinition = new System.Windows.Forms.ToolStripMenuItem();
-			this.btnRefresh = new System.Windows.Forms.Button();
-			this.btnConnect = new System.Windows.Forms.Button();
-			this.btnAddConnection = new System.Windows.Forms.Button();
-			this.btnDeleteSelectedConnection = new System.Windows.Forms.Button();
-			this.btnDeleteQuery = new System.Windows.Forms.Button();
-			this.btnAddQuery = new System.Windows.Forms.Button();
-			this.btnRunQuery = new System.Windows.Forms.Button();
 			this.mniCreateSelectQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniSelectAllRows = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniSelectRowCount = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,12 +66,18 @@ namespace SqlQueryTool
 			this.mniCreateInsertQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCreateUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCreateDeleteQuery = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmnTabpage = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniCloseTabpage = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmnStoredProcCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniCopyStoredProcName = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniGrantExecuteOnSP = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmnTableCommandsGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniShowTableRowCounts = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniHideEmptyTables = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniFindColumns = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.mniShowViewDefinition = new System.Windows.Forms.ToolStripMenuItem();
+			this.searchTimer = new System.Windows.Forms.Timer(this.components);
 			this.statusStrip1.SuspendLayout();
 			this.splMainContent.Panel1.SuspendLayout();
 			this.splMainContent.Panel2.SuspendLayout();
@@ -182,6 +183,17 @@ namespace SqlQueryTool
 			this.chkSearchSPContents.UseVisualStyleBackColor = true;
 			this.chkSearchSPContents.CheckedChanged += new System.EventHandler(this.chkSearchSPContents_CheckedChanged);
 			// 
+			// btnRefresh
+			// 
+			this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnRefresh.Image = global::SqlQueryTool.Properties.Resources.refresh;
+			this.btnRefresh.Location = new System.Drawing.Point(219, 0);
+			this.btnRefresh.Name = "btnRefresh";
+			this.btnRefresh.Size = new System.Drawing.Size(28, 23);
+			this.btnRefresh.TabIndex = 2;
+			this.btnRefresh.UseVisualStyleBackColor = true;
+			this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+			// 
 			// txtSearch
 			// 
 			this.txtSearch.AllowDrop = true;
@@ -250,8 +262,8 @@ namespace SqlQueryTool
 			// 
 			// colName
 			// 
-			dataGridViewCellStyle1.NullValue = "null";
-			this.colName.DefaultCellStyle = dataGridViewCellStyle1;
+			dataGridViewCellStyle3.NullValue = "null";
+			this.colName.DefaultCellStyle = dataGridViewCellStyle3;
 			this.colName.FillWeight = 137.8173F;
 			this.colName.HeaderText = "Väli";
 			this.colName.MinimumWidth = 60;
@@ -268,8 +280,8 @@ namespace SqlQueryTool
 			// 
 			// colDescription
 			// 
-			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			this.colDescription.DefaultCellStyle = dataGridViewCellStyle2;
+			dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			this.colDescription.DefaultCellStyle = dataGridViewCellStyle4;
 			this.colDescription.FillWeight = 24.36548F;
 			this.colDescription.HeaderText = "";
 			this.colDescription.Name = "colDescription";
@@ -290,6 +302,46 @@ namespace SqlQueryTool
 			this.pnlConnection.TabStop = false;
 			this.pnlConnection.Text = "Ühenduse seaded";
 			// 
+			// btnConnect
+			// 
+			this.btnConnect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnConnect.Image = global::SqlQueryTool.Properties.Resources.database_go;
+			this.btnConnect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnConnect.Location = new System.Drawing.Point(182, 46);
+			this.btnConnect.Name = "btnConnect";
+			this.btnConnect.Size = new System.Drawing.Size(70, 25);
+			this.btnConnect.TabIndex = 17;
+			this.btnConnect.Text = "Ühenda";
+			this.btnConnect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnConnect.UseVisualStyleBackColor = true;
+			this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
+			// 
+			// btnAddConnection
+			// 
+			this.btnAddConnection.Image = global::SqlQueryTool.Properties.Resources.database_add;
+			this.btnAddConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnAddConnection.Location = new System.Drawing.Point(6, 46);
+			this.btnAddConnection.Name = "btnAddConnection";
+			this.btnAddConnection.Size = new System.Drawing.Size(62, 25);
+			this.btnAddConnection.TabIndex = 16;
+			this.btnAddConnection.Text = "Uus...";
+			this.btnAddConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnAddConnection.UseVisualStyleBackColor = true;
+			this.btnAddConnection.Click += new System.EventHandler(this.btnAddConnection_Click);
+			// 
+			// btnDeleteSelectedConnection
+			// 
+			this.btnDeleteSelectedConnection.Image = global::SqlQueryTool.Properties.Resources.database_delete;
+			this.btnDeleteSelectedConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnDeleteSelectedConnection.Location = new System.Drawing.Point(74, 46);
+			this.btnDeleteSelectedConnection.Name = "btnDeleteSelectedConnection";
+			this.btnDeleteSelectedConnection.Size = new System.Drawing.Size(69, 25);
+			this.btnDeleteSelectedConnection.TabIndex = 13;
+			this.btnDeleteSelectedConnection.Text = "Kustuta";
+			this.btnDeleteSelectedConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnDeleteSelectedConnection.UseVisualStyleBackColor = true;
+			this.btnDeleteSelectedConnection.Click += new System.EventHandler(this.btnDeleteSelectedConnection_Click);
+			// 
 			// selPreviousConnections
 			// 
 			this.selPreviousConnections.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -301,6 +353,48 @@ namespace SqlQueryTool
 			this.selPreviousConnections.Size = new System.Drawing.Size(246, 21);
 			this.selPreviousConnections.TabIndex = 11;
 			this.selPreviousConnections.SelectedIndexChanged += new System.EventHandler(this.selPreviousConnections_SelectedIndexChanged);
+			// 
+			// btnDeleteQuery
+			// 
+			this.btnDeleteQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.btnDeleteQuery.Image = global::SqlQueryTool.Properties.Resources.script_delete;
+			this.btnDeleteQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnDeleteQuery.Location = new System.Drawing.Point(102, 543);
+			this.btnDeleteQuery.Name = "btnDeleteQuery";
+			this.btnDeleteQuery.Size = new System.Drawing.Size(94, 26);
+			this.btnDeleteQuery.TabIndex = 3;
+			this.btnDeleteQuery.Text = "Sulge päring";
+			this.btnDeleteQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnDeleteQuery.UseVisualStyleBackColor = true;
+			this.btnDeleteQuery.Click += new System.EventHandler(this.btnDeleteQuery_Click);
+			// 
+			// btnAddQuery
+			// 
+			this.btnAddQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.btnAddQuery.Image = global::SqlQueryTool.Properties.Resources.script_add;
+			this.btnAddQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnAddQuery.Location = new System.Drawing.Point(3, 543);
+			this.btnAddQuery.Name = "btnAddQuery";
+			this.btnAddQuery.Size = new System.Drawing.Size(93, 26);
+			this.btnAddQuery.TabIndex = 2;
+			this.btnAddQuery.Text = "Uus päring...";
+			this.btnAddQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnAddQuery.UseVisualStyleBackColor = true;
+			this.btnAddQuery.Click += new System.EventHandler(this.btnAddQuery_Click);
+			// 
+			// btnRunQuery
+			// 
+			this.btnRunQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnRunQuery.Image = global::SqlQueryTool.Properties.Resources.script_go;
+			this.btnRunQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnRunQuery.Location = new System.Drawing.Point(518, 543);
+			this.btnRunQuery.Name = "btnRunQuery";
+			this.btnRunQuery.Size = new System.Drawing.Size(96, 26);
+			this.btnRunQuery.TabIndex = 1;
+			this.btnRunQuery.Text = "Käivita päring";
+			this.btnRunQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnRunQuery.UseVisualStyleBackColor = true;
+			this.btnRunQuery.Click += new System.EventHandler(this.btnRunQuery_Click);
 			// 
 			// grpQueries
 			// 
@@ -344,139 +438,6 @@ namespace SqlQueryTool
             this.mniCreateDeleteQuery});
 			this.cmnTableCommands.Name = "cmnDatabaseObjects";
 			this.cmnTableCommands.Size = new System.Drawing.Size(197, 92);
-			// 
-			// cmnTabpage
-			// 
-			this.cmnTabpage.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniCloseTabpage});
-			this.cmnTabpage.Name = "cmnTabpage";
-			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.cmnTabpage.Size = new System.Drawing.Size(141, 26);
-			// 
-			// cmnStoredProcCommands
-			// 
-			this.cmnStoredProcCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniCopyStoredProcName,
-            this.mniGrantExecuteOnSP});
-			this.cmnStoredProcCommands.Name = "cmnStoredProcCommands";
-			this.cmnStoredProcCommands.Size = new System.Drawing.Size(239, 48);
-			// 
-			// cmnTableCommandsGlobal
-			// 
-			this.cmnTableCommandsGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniShowTableRowCounts,
-            this.mniHideEmptyTables,
-            this.mniFindColumns});
-			this.cmnTableCommandsGlobal.Name = "cmnTableCommandsGlobal";
-			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(232, 70);
-			// 
-			// cmnViewCommands
-			// 
-			this.cmnViewCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniShowViewDefinition});
-			this.cmnViewCommands.Name = "cmnViewCommands";
-			this.cmnViewCommands.Size = new System.Drawing.Size(203, 48);
-			// 
-			// mniShowViewDefinition
-			// 
-			this.mniShowViewDefinition.Image = global::SqlQueryTool.Properties.Resources.script_code;
-			this.mniShowViewDefinition.Name = "mniShowViewDefinition";
-			this.mniShowViewDefinition.Size = new System.Drawing.Size(202, 22);
-			this.mniShowViewDefinition.Text = "Näita vaate definitsiooni";
-			this.mniShowViewDefinition.Click += new System.EventHandler(this.mniShowViewDefinition_Click);
-			// 
-			// btnRefresh
-			// 
-			this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnRefresh.Image = global::SqlQueryTool.Properties.Resources.refresh;
-			this.btnRefresh.Location = new System.Drawing.Point(219, 0);
-			this.btnRefresh.Name = "btnRefresh";
-			this.btnRefresh.Size = new System.Drawing.Size(28, 23);
-			this.btnRefresh.TabIndex = 2;
-			this.btnRefresh.UseVisualStyleBackColor = true;
-			this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-			// 
-			// btnConnect
-			// 
-			this.btnConnect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnConnect.Image = global::SqlQueryTool.Properties.Resources.database_go;
-			this.btnConnect.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnConnect.Location = new System.Drawing.Point(182, 46);
-			this.btnConnect.Name = "btnConnect";
-			this.btnConnect.Size = new System.Drawing.Size(70, 25);
-			this.btnConnect.TabIndex = 17;
-			this.btnConnect.Text = "Ühenda";
-			this.btnConnect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnConnect.UseVisualStyleBackColor = true;
-			this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
-			// 
-			// btnAddConnection
-			// 
-			this.btnAddConnection.Image = global::SqlQueryTool.Properties.Resources.database_add;
-			this.btnAddConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnAddConnection.Location = new System.Drawing.Point(6, 46);
-			this.btnAddConnection.Name = "btnAddConnection";
-			this.btnAddConnection.Size = new System.Drawing.Size(62, 25);
-			this.btnAddConnection.TabIndex = 16;
-			this.btnAddConnection.Text = "Uus...";
-			this.btnAddConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnAddConnection.UseVisualStyleBackColor = true;
-			this.btnAddConnection.Click += new System.EventHandler(this.btnAddConnection_Click);
-			// 
-			// btnDeleteSelectedConnection
-			// 
-			this.btnDeleteSelectedConnection.Image = global::SqlQueryTool.Properties.Resources.database_delete;
-			this.btnDeleteSelectedConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnDeleteSelectedConnection.Location = new System.Drawing.Point(74, 46);
-			this.btnDeleteSelectedConnection.Name = "btnDeleteSelectedConnection";
-			this.btnDeleteSelectedConnection.Size = new System.Drawing.Size(69, 25);
-			this.btnDeleteSelectedConnection.TabIndex = 13;
-			this.btnDeleteSelectedConnection.Text = "Kustuta";
-			this.btnDeleteSelectedConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnDeleteSelectedConnection.UseVisualStyleBackColor = true;
-			this.btnDeleteSelectedConnection.Click += new System.EventHandler(this.btnDeleteSelectedConnection_Click);
-			// 
-			// btnDeleteQuery
-			// 
-			this.btnDeleteQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.btnDeleteQuery.Image = global::SqlQueryTool.Properties.Resources.script_delete;
-			this.btnDeleteQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnDeleteQuery.Location = new System.Drawing.Point(102, 543);
-			this.btnDeleteQuery.Name = "btnDeleteQuery";
-			this.btnDeleteQuery.Size = new System.Drawing.Size(94, 26);
-			this.btnDeleteQuery.TabIndex = 3;
-			this.btnDeleteQuery.Text = "Sulge päring";
-			this.btnDeleteQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnDeleteQuery.UseVisualStyleBackColor = true;
-			this.btnDeleteQuery.Click += new System.EventHandler(this.btnDeleteQuery_Click);
-			// 
-			// btnAddQuery
-			// 
-			this.btnAddQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.btnAddQuery.Image = global::SqlQueryTool.Properties.Resources.script_add;
-			this.btnAddQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnAddQuery.Location = new System.Drawing.Point(3, 543);
-			this.btnAddQuery.Name = "btnAddQuery";
-			this.btnAddQuery.Size = new System.Drawing.Size(93, 26);
-			this.btnAddQuery.TabIndex = 2;
-			this.btnAddQuery.Text = "Uus päring...";
-			this.btnAddQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnAddQuery.UseVisualStyleBackColor = true;
-			this.btnAddQuery.Click += new System.EventHandler(this.btnAddQuery_Click);
-			// 
-			// btnRunQuery
-			// 
-			this.btnRunQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnRunQuery.Image = global::SqlQueryTool.Properties.Resources.script_go;
-			this.btnRunQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnRunQuery.Location = new System.Drawing.Point(518, 543);
-			this.btnRunQuery.Name = "btnRunQuery";
-			this.btnRunQuery.Size = new System.Drawing.Size(96, 26);
-			this.btnRunQuery.TabIndex = 1;
-			this.btnRunQuery.Text = "Käivita päring";
-			this.btnRunQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnRunQuery.UseVisualStyleBackColor = true;
-			this.btnRunQuery.Click += new System.EventHandler(this.btnRunQuery_Click);
 			// 
 			// mniCreateSelectQuery
 			// 
@@ -546,6 +507,14 @@ namespace SqlQueryTool
 			this.mniCreateDeleteQuery.Text = "Koosta DELETE-päring";
 			this.mniCreateDeleteQuery.Click += new System.EventHandler(this.mniCreateDeleteQuery_Click);
 			// 
+			// cmnTabpage
+			// 
+			this.cmnTabpage.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniCloseTabpage});
+			this.cmnTabpage.Name = "cmnTabpage";
+			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+			this.cmnTabpage.Size = new System.Drawing.Size(141, 26);
+			// 
 			// mniCloseTabpage
 			// 
 			this.mniCloseTabpage.Image = global::SqlQueryTool.Properties.Resources.cross;
@@ -554,6 +523,14 @@ namespace SqlQueryTool
 			this.mniCloseTabpage.Size = new System.Drawing.Size(140, 22);
 			this.mniCloseTabpage.Text = "Sulge päring";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
+			// 
+			// cmnStoredProcCommands
+			// 
+			this.cmnStoredProcCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniCopyStoredProcName,
+            this.mniGrantExecuteOnSP});
+			this.cmnStoredProcCommands.Name = "cmnStoredProcCommands";
+			this.cmnStoredProcCommands.Size = new System.Drawing.Size(239, 48);
 			// 
 			// mniCopyStoredProcName
 			// 
@@ -570,6 +547,15 @@ namespace SqlQueryTool
 			this.mniGrantExecuteOnSP.Size = new System.Drawing.Size(238, 22);
 			this.mniGrantExecuteOnSP.Text = "Anna kasutajale käivitusõigus...";
 			this.mniGrantExecuteOnSP.Click += new System.EventHandler(this.mniGrantExecuteOnSP_Click);
+			// 
+			// cmnTableCommandsGlobal
+			// 
+			this.cmnTableCommandsGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniShowTableRowCounts,
+            this.mniHideEmptyTables,
+            this.mniFindColumns});
+			this.cmnTableCommandsGlobal.Name = "cmnTableCommandsGlobal";
+			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(232, 70);
 			// 
 			// mniShowTableRowCounts
 			// 
@@ -594,6 +580,26 @@ namespace SqlQueryTool
 			this.mniFindColumns.Size = new System.Drawing.Size(231, 22);
 			this.mniFindColumns.Text = "Otsi tulpasid…";
 			this.mniFindColumns.Click += new System.EventHandler(this.mniFindColumns_Click);
+			// 
+			// cmnViewCommands
+			// 
+			this.cmnViewCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniShowViewDefinition});
+			this.cmnViewCommands.Name = "cmnViewCommands";
+			this.cmnViewCommands.Size = new System.Drawing.Size(203, 26);
+			// 
+			// mniShowViewDefinition
+			// 
+			this.mniShowViewDefinition.Image = global::SqlQueryTool.Properties.Resources.script_code;
+			this.mniShowViewDefinition.Name = "mniShowViewDefinition";
+			this.mniShowViewDefinition.Size = new System.Drawing.Size(202, 22);
+			this.mniShowViewDefinition.Text = "Näita vaate definitsiooni";
+			this.mniShowViewDefinition.Click += new System.EventHandler(this.mniShowViewDefinition_Click);
+			// 
+			// searchTimer
+			// 
+			this.searchTimer.Interval = 200;
+			this.searchTimer.Tick += new System.EventHandler(this.searchTimer_Tick);
 			// 
 			// SQLQueryTool
 			// 
@@ -676,6 +682,7 @@ namespace SqlQueryTool
 		private System.Windows.Forms.ToolStripMenuItem mniFindColumns;
 		private System.Windows.Forms.ContextMenuStrip cmnViewCommands;
 		private System.Windows.Forms.ToolStripMenuItem mniShowViewDefinition;
+		private System.Windows.Forms.Timer searchTimer;
 
 
     }
