@@ -211,13 +211,12 @@ namespace SqlQueryTool
 				MessageBox.Show("Probleem SP-de laadimisega", "Hoiatus", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 			}
 
-			cmd.CommandText = "SELECT o.name, m.definition FROM sys.objects o JOIN sys.sql_modules m ON (m.object_id = o.object_id) WHERE o.type = 'V' ORDER BY o.name";
+			cmd.CommandText = "SELECT o.name, m.definition FROM sys.objects o JOIN sys.sql_modules m ON (m.object_id = o.object_id) WHERE o.type = 'V' AND m.definition IS NOT NULL ORDER BY o.name";
 			using (var rdr = cmd.ExecuteReader()) {
 				while (rdr.Read()) {
 					views.Add(new View() { Name = rdr.GetString(0), Definition = rdr.GetString(1) });
 				}
 			}
-
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
 		}
 
