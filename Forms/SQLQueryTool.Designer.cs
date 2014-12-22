@@ -29,8 +29,8 @@ namespace SqlQueryTool
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLQueryTool));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.lblStatusbarInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -67,6 +67,8 @@ namespace SqlQueryTool
 			this.mniCreateUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCreateDeleteQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmnTabpage = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.mniMoveTabLeft = new System.Windows.Forms.ToolStripMenuItem();
+			this.mniMoveTabRight = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCloseTabpage = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmnStoredProcCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniCopyStoredProcName = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,6 +80,8 @@ namespace SqlQueryTool
 			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniShowViewDefinition = new System.Windows.Forms.ToolStripMenuItem();
 			this.searchTimer = new System.Windows.Forms.Timer(this.components);
+			this.cmnQueryResultsCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.mniCreateRowUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1.SuspendLayout();
 			this.splMainContent.Panel1.SuspendLayout();
 			this.splMainContent.Panel2.SuspendLayout();
@@ -94,6 +98,7 @@ namespace SqlQueryTool
 			this.cmnStoredProcCommands.SuspendLayout();
 			this.cmnTableCommandsGlobal.SuspendLayout();
 			this.cmnViewCommands.SuspendLayout();
+			this.cmnQueryResultsCommands.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// statusStrip1
@@ -262,8 +267,8 @@ namespace SqlQueryTool
 			// 
 			// colName
 			// 
-			dataGridViewCellStyle3.NullValue = "null";
-			this.colName.DefaultCellStyle = dataGridViewCellStyle3;
+			dataGridViewCellStyle5.NullValue = "null";
+			this.colName.DefaultCellStyle = dataGridViewCellStyle5;
 			this.colName.FillWeight = 137.8173F;
 			this.colName.HeaderText = "Väli";
 			this.colName.MinimumWidth = 60;
@@ -280,8 +285,8 @@ namespace SqlQueryTool
 			// 
 			// colDescription
 			// 
-			dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			this.colDescription.DefaultCellStyle = dataGridViewCellStyle4;
+			dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			this.colDescription.DefaultCellStyle = dataGridViewCellStyle6;
 			this.colDescription.FillWeight = 24.36548F;
 			this.colDescription.HeaderText = "";
 			this.colDescription.Name = "colDescription";
@@ -510,17 +515,35 @@ namespace SqlQueryTool
 			// cmnTabpage
 			// 
 			this.cmnTabpage.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniMoveTabLeft,
+            this.mniMoveTabRight,
             this.mniCloseTabpage});
 			this.cmnTabpage.Name = "cmnTabpage";
 			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.cmnTabpage.Size = new System.Drawing.Size(141, 26);
+			this.cmnTabpage.Size = new System.Drawing.Size(163, 70);
+			// 
+			// mniMoveTabLeft
+			// 
+			this.mniMoveTabLeft.Image = global::SqlQueryTool.Properties.Resources.arrow_left;
+			this.mniMoveTabLeft.Name = "mniMoveTabLeft";
+			this.mniMoveTabLeft.Size = new System.Drawing.Size(162, 22);
+			this.mniMoveTabLeft.Text = "Nihuta vasakule";
+			this.mniMoveTabLeft.Click += new System.EventHandler(this.mniMoveTabLeft_Click);
+			// 
+			// mniMoveTabRight
+			// 
+			this.mniMoveTabRight.Image = global::SqlQueryTool.Properties.Resources.arrow_right;
+			this.mniMoveTabRight.Name = "mniMoveTabRight";
+			this.mniMoveTabRight.Size = new System.Drawing.Size(162, 22);
+			this.mniMoveTabRight.Text = "Nihuta paremale";
+			this.mniMoveTabRight.Click += new System.EventHandler(this.mniMoveTabRight_Click);
 			// 
 			// mniCloseTabpage
 			// 
 			this.mniCloseTabpage.Image = global::SqlQueryTool.Properties.Resources.cross;
 			this.mniCloseTabpage.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
 			this.mniCloseTabpage.Name = "mniCloseTabpage";
-			this.mniCloseTabpage.Size = new System.Drawing.Size(140, 22);
+			this.mniCloseTabpage.Size = new System.Drawing.Size(162, 22);
 			this.mniCloseTabpage.Text = "Sulge päring";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
 			// 
@@ -601,6 +624,21 @@ namespace SqlQueryTool
 			this.searchTimer.Interval = 200;
 			this.searchTimer.Tick += new System.EventHandler(this.searchTimer_Tick);
 			// 
+			// cmnQueryResultsCommands
+			// 
+			this.cmnQueryResultsCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniCreateRowUpdateQuery});
+			this.cmnQueryResultsCommands.Name = "cmnQueryResultsCommands";
+			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(197, 26);
+			// 
+			// mniCreateRowUpdateQuery
+			// 
+			this.mniCreateRowUpdateQuery.Image = global::SqlQueryTool.Properties.Resources.table_edit;
+			this.mniCreateRowUpdateQuery.Name = "mniCreateRowUpdateQuery";
+			this.mniCreateRowUpdateQuery.Size = new System.Drawing.Size(196, 22);
+			this.mniCreateRowUpdateQuery.Text = "Koosta UPDATE-päring";
+			this.mniCreateRowUpdateQuery.Click += new System.EventHandler(this.mniCreateRowUpdateQuery_Click);
+			// 
 			// SQLQueryTool
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -609,6 +647,7 @@ namespace SqlQueryTool
 			this.Controls.Add(this.splMainContent);
 			this.Controls.Add(this.statusStrip1);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.KeyPreview = true;
 			this.Name = "SQLQueryTool";
 			this.Text = "SQL query tool";
 			this.statusStrip1.ResumeLayout(false);
@@ -630,6 +669,7 @@ namespace SqlQueryTool
 			this.cmnStoredProcCommands.ResumeLayout(false);
 			this.cmnTableCommandsGlobal.ResumeLayout(false);
 			this.cmnViewCommands.ResumeLayout(false);
+			this.cmnQueryResultsCommands.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -683,6 +723,10 @@ namespace SqlQueryTool
 		private System.Windows.Forms.ContextMenuStrip cmnViewCommands;
 		private System.Windows.Forms.ToolStripMenuItem mniShowViewDefinition;
 		private System.Windows.Forms.Timer searchTimer;
+		private System.Windows.Forms.ContextMenuStrip cmnQueryResultsCommands;
+		private System.Windows.Forms.ToolStripMenuItem mniCreateRowUpdateQuery;
+		private System.Windows.Forms.ToolStripMenuItem mniMoveTabLeft;
+		private System.Windows.Forms.ToolStripMenuItem mniMoveTabRight;
 
 
     }

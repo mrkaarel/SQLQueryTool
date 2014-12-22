@@ -16,8 +16,9 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>true</IsWebBootstrapper>
-    <ApplicationIcon>QueryTool.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\QueryTool.ico</ApplicationIcon>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
     <PublishUrl>http://localhost/SQLQueryTool/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -32,7 +33,6 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -47,7 +47,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\Program Files %28x86%29\Overall\SqlQueryTool\</OutputPath>
+    <OutputPath>..\..\..\..\Temp\SqlQueryTool\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -68,29 +68,41 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Column.cs" />
-    <Compile Include="ColumnCollection.cs" />
-    <Compile Include="ConnectionData.cs" />
-    <Compile Include="RowCountFilterPrompt.cs">
+    <Compile Include="Connections\ConnectionDataStorage.cs" />
+    <Compile Include="DatabaseObjects\ColumnDefinition.cs" />
+    <Compile Include="DatabaseObjects\ColumnType.cs" />
+    <Compile Include="Connections\ConnectionData.cs" />
+    <Compile Include="DatabaseObjects\CommandParameter.cs" />
+    <Compile Include="DatabaseObjects\QueryBuilder.cs" />
+    <Compile Include="Forms\ParameterValuesPrompt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RowCountFilterPrompt.Designer.cs">
+    <Compile Include="Forms\ParameterValuesPrompt.Designer.cs">
+      <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\RowCountFilterPrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RowCountFilterPrompt.Designer.cs">
       <DependentUpon>RowCountFilterPrompt.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectionSettings.cs">
+    <Compile Include="Forms\ConnectionSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConnectionSettings.Designer.cs">
+    <Compile Include="Forms\ConnectionSettings.Designer.cs">
       <DependentUpon>ConnectionSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Helper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="RowCountFilterPrompt.resx">
+    <Compile Include="Utils\WinFormsHelper.cs" />
+    <EmbeddedResource Include="Forms\ParameterValuesPrompt.resx">
+      <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RowCountFilterPrompt.resx">
       <DependentUpon>RowCountFilterPrompt.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConnectionSettings.resx">
+    <EmbeddedResource Include="Forms\ConnectionSettings.resx">
       <DependentUpon>ConnectionSettings.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -99,7 +111,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SQLQueryTool.resx">
+    <EmbeddedResource Include="Forms\SQLQueryTool.resx">
       <DependentUpon>SQLQueryTool.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -118,13 +130,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="SQLQueryTool.cs">
+    <Compile Include="Forms\SQLQueryTool.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SQLQueryTool.Designer.cs">
+    <Compile Include="Forms\SQLQueryTool.Designer.cs">
       <DependentUpon>SQLQueryTool.cs</DependentUpon>
     </Compile>
-    <Compile Include="Table.cs" />
+    <Compile Include="DatabaseObjects\TableDefinition.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -154,12 +166,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="database.ico" />
-    <Content Include="External libraries\SciLexer.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Resources\database.ico" />
+    <None Include="External libraries\SciLexer.dll" />
     <Content Include="External libraries\ScintillaNet.dll" />
-    <Content Include="QueryTool.ico" />
+    <Content Include="Resources\QueryTool.ico" />
+    <None Include="Resources\arrow_left.png" />
+    <None Include="Resources\arrow_right.png" />
     <Content Include="Resources\find.png" />
     <Content Include="Resources\key.png" />
     <Content Include="Resources\script.png" />
@@ -186,6 +198,9 @@
     <None Include="Resources\database_go.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(ProjectDir)\External Libraries\*.*" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
