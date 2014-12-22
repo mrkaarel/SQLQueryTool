@@ -225,7 +225,7 @@ namespace SqlQueryTool
 			if (tables.Count > 0) {
 				var tablesRootNode = new TreeNode() { Name = "Tables", Text = "Tabelid", ContextMenuStrip = cmnTableCommandsGlobal };
 				foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
-					tablesRootNode.Nodes.Add(new TreeNode() { Name = tableInfo.Name, Text = tableInfo.Name, ContextMenuStrip = cmnTableCommands });
+					tablesRootNode.Nodes.Add(new TreeNode() { Name = tableInfo.Name, Text =  tableInfo.RowCount < Int32.MaxValue ? String.Format("{0} ({1})", tableInfo.Name, tableInfo.RowCount) : tableInfo.Name, ContextMenuStrip = cmnTableCommands });
 				}
 				trvDatabaseObjects.Nodes.Add(tablesRootNode);
 			}
@@ -428,7 +428,7 @@ namespace SqlQueryTool
 
 		private void HideEmptyTables()
 		{
-			if (Settings_MinimumRowCount > 0 && tables.All(t => t.RowCount == Int32.MaxValue)) {
+			if (tables.All(t => t.RowCount == Int32.MaxValue)) {
 				using (var conn = currentConnectionData.GetOpenConnection()) {
 					AddRowCountsToTableInfos(conn);
 				}
