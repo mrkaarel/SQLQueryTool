@@ -17,7 +17,7 @@ namespace SqlQueryTool
 	[System.Diagnostics.DebuggerDisplay("Form1")]
 	public partial class SQLQueryTool : Form
 	{
-		private const string EMPTY_SEARCHBOX_TEXT = "otsi...";
+		private const string EMPTY_SEARCHBOX_TEXT = "otsi…";
 		private int Settings_MinimumRowCount = 0;
 
 		private ConnectionData currentConnectionData;
