@@ -29,8 +29,8 @@ namespace SqlQueryTool
         private void InitializeComponent()
         {
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLQueryTool));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.lblStatusbarInfo = new System.Windows.Forms.ToolStripStatusLabel();
@@ -209,7 +209,7 @@ namespace SqlQueryTool
 			this.txtSearch.Name = "txtSearch";
 			this.txtSearch.Size = new System.Drawing.Size(212, 20);
 			this.txtSearch.TabIndex = 1;
-			this.txtSearch.Text = "otsi...";
+			this.txtSearch.Text = "otsi…";
 			this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
 			this.txtSearch.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtSearch_DragDrop);
 			this.txtSearch.DragEnter += new System.Windows.Forms.DragEventHandler(this.txtSearch_DragEnter);
@@ -267,8 +267,8 @@ namespace SqlQueryTool
 			// 
 			// colName
 			// 
-			dataGridViewCellStyle5.NullValue = "null";
-			this.colName.DefaultCellStyle = dataGridViewCellStyle5;
+			dataGridViewCellStyle1.NullValue = "null";
+			this.colName.DefaultCellStyle = dataGridViewCellStyle1;
 			this.colName.FillWeight = 137.8173F;
 			this.colName.HeaderText = "Väli";
 			this.colName.MinimumWidth = 60;
@@ -285,8 +285,8 @@ namespace SqlQueryTool
 			// 
 			// colDescription
 			// 
-			dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			this.colDescription.DefaultCellStyle = dataGridViewCellStyle6;
+			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			this.colDescription.DefaultCellStyle = dataGridViewCellStyle2;
 			this.colDescription.FillWeight = 24.36548F;
 			this.colDescription.HeaderText = "";
 			this.colDescription.Name = "colDescription";
