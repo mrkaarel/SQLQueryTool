@@ -85,7 +85,7 @@ namespace SqlQueryTool.Connections
 			return result.ToString();
 		}
 
-		public string SettingString
+		public string SerializedString
 		{
 			get
 			{

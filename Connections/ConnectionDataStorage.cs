@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
@@ -9,47 +10,28 @@ namespace SqlQueryTool.Connections
 {
 	public class ConnectionDataStorage
 	{
-		private const string STORAGE_KEY = "slokoroirsirraequurqemio";
-		private const string STORAGE_IV = "biiteher";
-		private const string STORAGE_FILE_NAME = "userSettings.dat";
+		private static readonly string STORAGE_FILE_NAME = "SavedConnections";
 
+		private static readonly Encoding STORAGE_ENCODING = Encoding.UTF8;
+		private static readonly string STORAGE_ITEM_SEPARATOR = Environment.NewLine;
 
 		public static List<ConnectionData> LoadSavedSettings()
 		{
 			var previousSettings = new List<ConnectionData>();
-
 			using (var storageStream = OpenStorageStream(FileMode.OpenOrCreate)) {
-				if (storageStream.Length > 0) {
-					var cryptoStream = new CryptoStream(storageStream, GetCryptoAlgorithm().CreateDecryptor(), CryptoStreamMode.Read);
+				var protectedSettings = ReadFully(storageStream);
+				
+				if (protectedSettings.Length == 0) {
+					return previousSettings;	
+				}
 
-					using (var rdr = new StreamReader(cryptoStream)) {
-						while (!rdr.EndOfStream) {
-							previousSettings.Add(new ConnectionData(rdr.ReadLine()));
-						}
-					}
+				var settingsString = STORAGE_ENCODING.GetString(ProtectedData.Unprotect(protectedSettings, null, DataProtectionScope.CurrentUser));
+				foreach (var serializedSettingsString in settingsString.Split(new string[] { STORAGE_ITEM_SEPARATOR }, StringSplitOptions.RemoveEmptyEntries )) {
+					previousSettings.Add(new ConnectionData(serializedSettingsString));
 				}
 			}
 
 			return previousSettings;
-		}
-
-		public static void WriteSettingsToFile(IEnumerable<ConnectionData> settings)
-		{
-			using (var storageStream = OpenStorageStream(FileMode.Create)) {
-				var cryptoStream = new CryptoStream(storageStream, GetCryptoAlgorithm().CreateEncryptor(), CryptoStreamMode.Write);
-
-				using (var writer = new StreamWriter(cryptoStream)) {
-					foreach (ConnectionData setting in settings) {
-						writer.WriteLine(setting.SettingString);
-					}
-				}
-			}
-		}
-
-		private static byte[] StringToByteArray(string s)
-		{
-			ASCIIEncoding enc = new ASCIIEncoding();
-			return enc.GetBytes(s);
 		}
 
 		public static IEnumerable<ConnectionData> AddSetting(ConnectionData setting)
@@ -63,7 +45,7 @@ namespace SqlQueryTool.Connections
 
 		public static IEnumerable<ConnectionData> DeleteSetting(ConnectionData settingToDelete)
 		{
-			var settings = LoadSavedSettings().Where(s => s.SettingString != settingToDelete.SettingString).ToList();
+			var settings = LoadSavedSettings().Where(s => s.SerializedString != settingToDelete.SerializedString).ToList();
 			WriteSettingsToFile(settings);
 
 			return settings;
@@ -75,20 +57,32 @@ namespace SqlQueryTool.Connections
 			return AddSetting(setting);
 		}
 
+		private static void WriteSettingsToFile(IEnumerable<ConnectionData> settings)
+		{
+			using (var storageStream = OpenStorageStream(FileMode.Create)) {
+				string settingsString = String.Join(STORAGE_ITEM_SEPARATOR, settings.Select(s => s.SerializedString).ToArray());
+				var protectedSettings = ProtectedData.Protect(STORAGE_ENCODING.GetBytes(settingsString), null, DataProtectionScope.CurrentUser);
+
+				storageStream.Write(protectedSettings, 0, protectedSettings.Length);
+			}
+		}
+
+		private static byte[] ReadFully(Stream input)
+		{
+			byte[] buffer = new byte[16 * 1024];
+			using (MemoryStream ms = new MemoryStream()) {
+				int read;
+				while ((read = input.Read(buffer, 0, buffer.Length)) > 0) {
+					ms.Write(buffer, 0, read);
+				}
+				return ms.ToArray();
+			}
+		}
+
 		private static IsolatedStorageFileStream OpenStorageStream(FileMode openMode)
 		{
 			var userData = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Assembly | IsolatedStorageScope.Domain, null, null);
 			return new IsolatedStorageFileStream(STORAGE_FILE_NAME, openMode, userData);
 		}
-
-		private static SymmetricAlgorithm GetCryptoAlgorithm()
-		{
-			var tripleDes = TripleDESCryptoServiceProvider.Create();
-			tripleDes.Key = StringToByteArray(STORAGE_KEY);
-			tripleDes.IV = StringToByteArray(STORAGE_IV);
-
-			return tripleDes;
-		}
-
 	}
 }
