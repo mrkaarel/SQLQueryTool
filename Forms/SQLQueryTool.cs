@@ -30,8 +30,13 @@ namespace SqlQueryTool.Forms
 		{
 			InitializeComponent();
 
-			BuildPreviousConnections(ConnectionDataStorage.LoadSavedSettings());
+			connectionManager.OnConnectionInitiated += connectionManager_OnConnectionInitiated;
 			ToggleCurrentQueryControls(enabled: false);
+		}
+
+		void connectionManager_OnConnectionInitiated(ConnectionData connectionData)
+		{
+			ConnectToDatabase(connectionData);
 		}
 
 		private void AddNewQueryPage(string queryText, string tabName = "")
@@ -50,11 +55,6 @@ namespace SqlQueryTool.Forms
 			ToggleCurrentQueryControls(enabled: true);
 		}
 
-		private string FormatSqlQuery(string queryText)
-		{
-			return queryText.Replace("\r", Environment.NewLine).Replace("   ", "\t");
-		}
-
 		private void ConnectToDatabase(ConnectionData connectionData)
 		{
 			try {
@@ -63,13 +63,12 @@ namespace SqlQueryTool.Forms
 				this.Text = String.Format("{0} - SQL Query Tool", connectionData);
 				grpDatabaseObjects.Enabled = true;
 				splMainContent.Panel2.Enabled = true;
-				btnConnect.Enabled = false;
+				connectionManager.SetConnectionAchieved();
 				lblStatusbarInfo.Text = String.Format("Ühendatud {0}@{1}", connectionData.DatabaseName, connectionData.ServerName);
 			}
 			catch (Exception ex) {
 				MessageBox.Show(String.Format("Viga andmebaasiühendusega:\n{0}", ex.Message), "Viga andmebaasiühendusega", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-
 		}
 
 		private void FillDatabaseObjects(ConnectionData connectionData)
@@ -231,24 +230,6 @@ namespace SqlQueryTool.Forms
 			return cmd;
 		}
 
-		private void BuildPreviousConnections(IEnumerable<ConnectionData> connections)
-		{
-			selPreviousConnections.Items.Clear();
-			foreach (ConnectionData setting in connections) {
-				selPreviousConnections.Items.Add(setting);
-			}
-
-			selPreviousConnections.Items.Insert(0, String.Empty);
-			ToggleSelectedConnectionButtons();
-		}
-
-		private void ToggleSelectedConnectionButtons()
-		{
-			var enableButtons = selPreviousConnections.Items.Count > 0 && selPreviousConnections.SelectedItem != null && !String.IsNullOrEmpty(selPreviousConnections.SelectedItem.ToString());
-			btnDeleteSelectedConnection.Enabled = enableButtons;
-			btnConnect.Enabled = enableButtons;
-		}
-
 		private void HideTableFieldsOverview()
 		{
 			dgvTableFields.DataSource = null;
@@ -389,15 +370,6 @@ namespace SqlQueryTool.Forms
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
-		private void btnConnect_Click(object sender, EventArgs e)
-		{
-			if (selPreviousConnections.SelectedItem != null && !String.IsNullOrEmpty(selPreviousConnections.SelectedItem.ToString())) {
-				var connectionData = selPreviousConnections.SelectedItem as ConnectionData;
-				ConnectionDataStorage.MoveFirst(connectionData);
-				ConnectToDatabase(connectionData);
-			}
-		}
-
 		private void btnRunQuery_Click(object sender, EventArgs e)
 		{
 			var currentPage = tabQueries.SelectedTab;
@@ -419,33 +391,6 @@ namespace SqlQueryTool.Forms
 				lblStatusbarInfo.Text = "";
 				MessageBox.Show(ex.Message, "Viga", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
-		}
-
-		private void btnDeleteSelectedConnection_Click(object sender, EventArgs e)
-		{
-			if (!String.IsNullOrEmpty(selPreviousConnections.SelectedItem.ToString())) {
-				var settings = ConnectionDataStorage.DeleteSetting(selPreviousConnections.SelectedItem as ConnectionData);
-				BuildPreviousConnections(settings);
-			}
-		}
-
-		private void btnAddConnection_Click(object sender, EventArgs e)
-		{
-			var connectionSettingsPrompt = new ConnectionSettings();
-			if (connectionSettingsPrompt.ShowDialog() == DialogResult.OK) {
-				var newConnectionData = connectionSettingsPrompt.ConnectionData;
-
-				var settings = ConnectionDataStorage.AddSetting(newConnectionData);
-				BuildPreviousConnections(settings);
-				selPreviousConnections.SelectedIndex = 1;
-				ToggleSelectedConnectionButtons();
-				ConnectToDatabase(connectionSettingsPrompt.ConnectionData);
-			}
-		}
-
-		private void selPreviousConnections_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			ToggleSelectedConnectionButtons();
 		}
 
 		private void trvDatabaseObjects_AfterSelect(object sender, TreeViewEventArgs e)
