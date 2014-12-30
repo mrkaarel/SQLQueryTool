@@ -1,6 +1,6 @@
-using ScintillaNet;
 using SqlQueryTool.Connections;
 using SqlQueryTool.DatabaseObjects;
+using SqlQueryTool.Forms;
 using SqlQueryTool.Properties;
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SqlQueryTool
+namespace SqlQueryTool.Forms
 {
 	[System.Diagnostics.DebuggerDisplay("Form1")]
 	public partial class SQLQueryTool : Form
@@ -29,107 +29,25 @@ namespace SqlQueryTool
 		public SQLQueryTool()
 		{
 			InitializeComponent();
-			BuildConnectionsDropdown(ConnectionDataStorage.LoadSavedSettings());
-			ToggleCurrentQueryControls(tabQueries.TabPages.Count > 0);
+
+			BuildPreviousConnections(ConnectionDataStorage.LoadSavedSettings());
+			ToggleCurrentQueryControls(enabled: false);
 		}
 
 		private void AddNewQueryPage(string queryText, string tabName = "")
 		{
-			var tpQueryPage = new TabPage();
-			if (String.IsNullOrEmpty(tabName)) {
-				tpQueryPage.Text = String.Format("Päring {0}", tabQueries.TabPages.Count + 1);
-			}
-			else {
-				tpQueryPage.Text = tabName;
-			}
-			tpQueryPage.ImageIndex = 0;
+			var queryEditor = new QueryEditor() { Name = "queryEditor", Dock = DockStyle.Fill };
+			queryEditor.SetQueryText(queryText);
+			queryEditor.OnRowUpdate += queryEditor_OnRowUpdate;
 
-			SplitContainer splQuery = new SplitContainer();
-			splQuery.Name = "splQuery";
-			splQuery.Orientation = Orientation.Horizontal;
-			splQuery.Dock = DockStyle.Fill;
-			splQuery.SplitterWidth = 8;
-			splQuery.Panel2Collapsed = true;
+			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Päring {0}", tabQueries.TabPages.Count + 1) : tabName;
+			var tpQueryPage = new TabPage(tabName) { ImageIndex = 0 };
 
-			Scintilla txtQueryText = new Scintilla();
-			txtQueryText.Name = "txtQueryText";
-			txtQueryText.Text = queryText;
-			txtQueryText.ConfigurationManager.CustomLocation = "ScintillaNET.xml";
-			txtQueryText.ConfigurationManager.Language = "mssql";
-			txtQueryText.Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom | AnchorStyles.Left;
-			txtQueryText.Size = new Size(splQuery.Panel1.Width - 3, splQuery.Panel1.Height - 3);
-			txtQueryText.Scrolling.HorizontalWidth = txtQueryText.Size.Width;
-			txtQueryText.Scrolling.ScrollBars = ScrollBars.Both;
-
-			Panel pnlHelper = new Panel();
-			pnlHelper.Name = "pnlHelper";
-			pnlHelper.Dock = DockStyle.Fill;
-
-			DataGridView dgResults = new DataGridView();
-			dgResults.Name = "dgResults";
-			dgResults.AllowUserToAddRows = false;
-			dgResults.AllowUserToDeleteRows = false;
-			dgResults.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-			dgResults.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-			dgResults.ReadOnly = true;
-			dgResults.RowHeadersVisible = false;
-			dgResults.Dock = DockStyle.Fill;
-			dgResults.ScrollBars = ScrollBars.Both;
-			dgResults.SelectionChanged += new EventHandler(dgResults_SelectionChanged);
-			dgResults.KeyDown += new KeyEventHandler(dgResults_KeyDown);
-			dgResults.PreviewKeyDown += new PreviewKeyDownEventHandler(dgResults_PreviewKeyDown);
-			dgResults.CellMouseDown += dgResults_CellMouseDown;
-			dgResults.CellMouseClick += dgResults_CellMouseClick;
-			dgResults.DataError += dgResults_DataError;
-
-			splQuery.Panel1.Controls.Add(txtQueryText);
-
-			pnlHelper.Controls.Add(dgResults);
-			splQuery.Panel2.Controls.Add(pnlHelper);
-
-			tpQueryPage.Controls.Add(splQuery);
+			tpQueryPage.Controls.Add(queryEditor);
 			tabQueries.TabPages.Add(tpQueryPage);
 			tabQueries.SelectedTab = tpQueryPage;
 
-			ToggleCurrentQueryControls(tabQueries.TabPages.Count > 0);
-		}
-
-		private void StartResultsTableDrag(DataGridView resultsTable)
-		{
-			if (!resultsTable.IsSelectionColumn()) {
-				return;
-			}
-
-			var selectedCells = resultsTable.GetSelectedCells();
-			string columnName = selectedCells.First().OwningColumn.Name;
-			var dragAndDropValues = selectedCells.OrderBy(c => c.RowIndex).Select(c => new DragDropCellValue() { ColumnName = columnName, Value = c.FormattedValue.ToString(), SqlFormattedValue = GetSQLFormattedValue(c) }).ToList();
-
-			resultsTable.DoDragDrop(dragAndDropValues, DragDropEffects.Copy);
-		}
-
-		private void DoListCopy(DataGridView resultsTable)
-		{
-			if (!resultsTable.IsSelectionColumn()) {
-				return;
-			}
-
-			var selectedCells = resultsTable.GetSelectedCells();
-			string result = String.Join(", ", selectedCells.OrderBy(c => c.RowIndex).Select(GetSQLFormattedValue).ToArray());
-			WinFormsHelper.CopyTextToClipboard(result);
-		}
-
-		private string GetSQLFormattedValue(DataGridViewCell cell)
-		{
-			string cellType = cell.ValueType.ToString();
-			string value = cell.FormattedValue.ToString();
-
-			bool useQuotes = (cellType == "System.String" || cellType == "System.DateTime" || cellType == "System.Guid");
-			if (cellType == "System.Boolean") {
-				value = (bool)cell.Value ? "1" : "0";
-			}
-
-
-			return String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
+			ToggleCurrentQueryControls(enabled: true);
 		}
 
 		private string FormatSqlQuery(string queryText)
@@ -252,8 +170,8 @@ namespace SqlQueryTool
 
 		private void RunQuery(TabPage currentPage)
 		{
-			var splCurrentContainer = (SplitContainer)currentPage.Controls["splQuery"];
-			string queryText = ((Scintilla)splCurrentContainer.Panel1.Controls["txtQueryText"]).Text;
+			var queryEditor = currentPage.Controls["queryEditor"] as QueryEditor;
+			string queryText = queryEditor.QueryText;
 
 			using (var conn = currentConnectionData.GetOpenConnection()) {
 				var cmd = BuildCommand(conn, queryText);
@@ -274,8 +192,7 @@ namespace SqlQueryTool
 					decimal resultTime = Decimal.Round(stopWatch.ElapsedMilliseconds / 1000m, 1);
 					lblStatusbarInfo.Text = String.Format("{0} kirjet ({1} sekundit; {2}, {3:HH:mm:ss})", results.Rows.Count, resultTime, currentPage.Text, DateTime.Now);
 
-					splCurrentContainer.Panel2Collapsed = false;
-					BuildQueryResultsTable((splCurrentContainer.Panel2.Controls["pnlHelper"]).Controls["dgResults"] as DataGridView, new BindingSource() { DataSource = results });
+					queryEditor.ShowResults(new BindingSource() { DataSource = results });
 				}
 				else {
 					int rowsAffected = cmd.ExecuteNonQuery();
@@ -287,16 +204,6 @@ namespace SqlQueryTool
 					}
 				}
 			}
-		}
-
-		private void BuildQueryResultsTable(DataGridView dgResults, BindingSource bindingSource)
-		{
-			dgResults.Columns.Clear();
-			dgResults.AutoGenerateColumns = true;
-			dgResults.SuspendLayout();
-			dgResults.DataSource = bindingSource;
-			dgResults.AutoResizeColumns();
-			dgResults.ResumeLayout();
 		}
 
 		private DbCommand BuildCommand(DbConnection conn, string queryText)
@@ -324,7 +231,7 @@ namespace SqlQueryTool
 			return cmd;
 		}
 
-		private void BuildConnectionsDropdown(IEnumerable<ConnectionData> connections)
+		private void BuildPreviousConnections(IEnumerable<ConnectionData> connections)
 		{
 			selPreviousConnections.Items.Clear();
 			foreach (ConnectionData setting in connections) {
@@ -426,7 +333,7 @@ namespace SqlQueryTool
 			}
 		}
 
-		private void HideEmptyTables()
+		private void AddTableRowFilter()
 		{
 			if (tables.All(t => t.RowCount == Int32.MaxValue)) {
 				using (var conn = currentConnectionData.GetOpenConnection()) {
@@ -435,22 +342,25 @@ namespace SqlQueryTool
 			}
 
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
+			trvDatabaseObjects.Nodes["Tables"].Text = Settings_MinimumRowCount == 0 ? "Tabelid" : String.Format("Tabelid (>= {0} rida)", Settings_MinimumRowCount);
 			lblStatusbarInfo.Text = String.Format("Näitan {0} tabelit {1}st", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count);
 		}
 
-		private string BuildRowUpdateQuery(string tableName, IEnumerable<DataGridViewCell> selectedCells)
+		private string BuildRowUpdateQuery(string tableName, DataGridView dataGridView)
 		{
+			var selectedCells = dataGridView.GetSelectedCells();
+
 			var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, tableName));
 
 			foreach (var cell in selectedCells.OrderBy(c => c.ColumnIndex)) {
 				string columnName = cell.OwningColumn.Name;
-				queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, columnName, GetSQLFormattedValue(cell));
+				queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, columnName, QueryEditor.GetSQLFormattedValue(cell));
 			}
 			queryText.Remove(queryText.Length - 2, 2);
 
 			var firstCellInRow = selectedCells.First().OwningRow.Cells[0];
 
-			queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, firstCellInRow.OwningColumn.Name, GetSQLFormattedValue(firstCellInRow));
+			queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, firstCellInRow.OwningColumn.Name, QueryEditor.GetSQLFormattedValue(firstCellInRow));
 
 			return queryText.ToString();
 		}
@@ -491,11 +401,10 @@ namespace SqlQueryTool
 		private void btnRunQuery_Click(object sender, EventArgs e)
 		{
 			var currentPage = tabQueries.SelectedTab;
-			if (currentPage == null) {
-				return;
-			}
+			var queryEditor = currentPage.Controls["queryEditor"] as QueryEditor;
 
-			string queryText = ((currentPage.Controls["splQuery"] as SplitContainer).Panel1.Controls["txtQueryText"] as Scintilla).Text;
+			string queryText = queryEditor.QueryText;
+
 			if (!ConfirmQuery(queryText)) {
 				return;
 			}
@@ -516,7 +425,7 @@ namespace SqlQueryTool
 		{
 			if (!String.IsNullOrEmpty(selPreviousConnections.SelectedItem.ToString())) {
 				var settings = ConnectionDataStorage.DeleteSetting(selPreviousConnections.SelectedItem as ConnectionData);
-				BuildConnectionsDropdown(settings);
+				BuildPreviousConnections(settings);
 			}
 		}
 
@@ -527,7 +436,7 @@ namespace SqlQueryTool
 				var newConnectionData = connectionSettingsPrompt.ConnectionData;
 
 				var settings = ConnectionDataStorage.AddSetting(newConnectionData);
-				BuildConnectionsDropdown(settings);
+				BuildPreviousConnections(settings);
 				selPreviousConnections.SelectedIndex = 1;
 				ToggleSelectedConnectionButtons();
 				ConnectToDatabase(connectionSettingsPrompt.ConnectionData);
@@ -718,7 +627,7 @@ namespace SqlQueryTool
 			if (prompt.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 				Settings_MinimumRowCount = prompt.RowCount;
 			}
-			HideEmptyTables();
+			AddTableRowFilter();
 		}
 
 		private void mniFindColumns_Click(object sender, EventArgs e)
@@ -767,64 +676,16 @@ namespace SqlQueryTool
 			BuildSelectQueryTabPage(node.Name, QueryBuilder.TableSelectLimit.None, String.Format("{0} IN ({1})", values.First().ColumnName, String.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray())));
 		}
 
-		private void mniCreateRowUpdateQuery_Click(object sender, EventArgs e)
-		{
-			string tableName = tabQueries.SelectedTab.Text;
-			AddNewQueryPage(BuildRowUpdateQuery(tableName, (cmnQueryResultsCommands.Tag as DataGridView).GetSelectedCells()), String.Format("{0} (u)", tableName));
-		}
-
 		private void searchTimer_Tick(object sender, EventArgs e)
 		{
 			searchTimer.Stop();
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
 		}
 
-		private void dgResults_SelectionChanged(object sender, EventArgs e)
+		private void queryEditor_OnRowUpdate(DataGridView dataGridView)
 		{
-			(sender as DataGridView).ToggleColumnNamesCopy();
-		}
-
-		private void dgResults_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-		{
-			if (e.KeyCode == Keys.C) {
-				e.IsInputKey = true;
-			}
-		}
-
-		private void dgResults_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.Control && e.Shift && e.KeyCode == Keys.C) {
-				DoListCopy(sender as DataGridView);
-				e.Handled = true;
-			}
-		}
-
-		private void dgResults_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Right) {
-				var dataGrid = sender as DataGridView;
-				var selectedCells = dataGrid.GetSelectedCells();
-
-				if (selectedCells.Count() <= 1) {
-					dataGrid.CurrentCell = dataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex];
-				}
-
-				cmnQueryResultsCommands.Tag = dataGrid;
-				cmnQueryResultsCommands.Show(dataGrid, dataGrid.PointToClient(Cursor.Position));
-				mniCreateRowUpdateQuery.Enabled = dataGrid.IsSelectionRow();
-			}
-		}
-
-		private void dgResults_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-		{
-			if (Control.ModifierKeys == Keys.Alt) {
-				StartResultsTableDrag(sender as DataGridView);
-			}
-		}
-
-		private void dgResults_DataError(object sender, DataGridViewDataErrorEventArgs e)
-		{
-			//DO NOTHING (tekkis jama mingite pilditulpade kuvamisega. Las olla nii, kuni midagi paremat teha ei oska)
+			string tableName = tabQueries.SelectedTab.Text;
+			AddNewQueryPage(BuildRowUpdateQuery(tableName, dataGridView), String.Format("{0} (u)", tableName));
 		}
 
 		#endregion
@@ -845,13 +706,6 @@ namespace SqlQueryTool
 		{
 			public string Name { get; set; }
 			public long RowCount { get; set; }
-		}
-
-		class DragDropCellValue
-		{
-			public string ColumnName { get; set; }
-			public string Value { get; set; }
-			public string SqlFormattedValue { get; set; }
 		}
 	}
 }

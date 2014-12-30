@@ -1,4 +1,4 @@
-namespace SqlQueryTool
+namespace SqlQueryTool.Forms
 {
     partial class SQLQueryTool
     {
@@ -80,8 +80,6 @@ namespace SqlQueryTool
 			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniShowViewDefinition = new System.Windows.Forms.ToolStripMenuItem();
 			this.searchTimer = new System.Windows.Forms.Timer(this.components);
-			this.cmnQueryResultsCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.mniCreateRowUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1.SuspendLayout();
 			this.splMainContent.Panel1.SuspendLayout();
 			this.splMainContent.Panel2.SuspendLayout();
@@ -98,7 +96,6 @@ namespace SqlQueryTool
 			this.cmnStoredProcCommands.SuspendLayout();
 			this.cmnTableCommandsGlobal.SuspendLayout();
 			this.cmnViewCommands.SuspendLayout();
-			this.cmnQueryResultsCommands.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// statusStrip1
@@ -624,21 +621,6 @@ namespace SqlQueryTool
 			this.searchTimer.Interval = 200;
 			this.searchTimer.Tick += new System.EventHandler(this.searchTimer_Tick);
 			// 
-			// cmnQueryResultsCommands
-			// 
-			this.cmnQueryResultsCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniCreateRowUpdateQuery});
-			this.cmnQueryResultsCommands.Name = "cmnQueryResultsCommands";
-			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(197, 26);
-			// 
-			// mniCreateRowUpdateQuery
-			// 
-			this.mniCreateRowUpdateQuery.Image = global::SqlQueryTool.Properties.Resources.table_edit;
-			this.mniCreateRowUpdateQuery.Name = "mniCreateRowUpdateQuery";
-			this.mniCreateRowUpdateQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateRowUpdateQuery.Text = "Koosta UPDATE-päring";
-			this.mniCreateRowUpdateQuery.Click += new System.EventHandler(this.mniCreateRowUpdateQuery_Click);
-			// 
 			// SQLQueryTool
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -669,7 +651,6 @@ namespace SqlQueryTool
 			this.cmnStoredProcCommands.ResumeLayout(false);
 			this.cmnTableCommandsGlobal.ResumeLayout(false);
 			this.cmnViewCommands.ResumeLayout(false);
-			this.cmnQueryResultsCommands.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -723,8 +704,6 @@ namespace SqlQueryTool
 		private System.Windows.Forms.ContextMenuStrip cmnViewCommands;
 		private System.Windows.Forms.ToolStripMenuItem mniShowViewDefinition;
 		private System.Windows.Forms.Timer searchTimer;
-		private System.Windows.Forms.ContextMenuStrip cmnQueryResultsCommands;
-		private System.Windows.Forms.ToolStripMenuItem mniCreateRowUpdateQuery;
 		private System.Windows.Forms.ToolStripMenuItem mniMoveTabLeft;
 		private System.Windows.Forms.ToolStripMenuItem mniMoveTabRight;
 

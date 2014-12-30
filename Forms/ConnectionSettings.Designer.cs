@@ -1,4 +1,4 @@
-﻿namespace SqlQueryTool
+﻿namespace SqlQueryTool.Forms
 {
     partial class ConnectionSettings
     {

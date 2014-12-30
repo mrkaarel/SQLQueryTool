@@ -90,4 +90,12 @@ namespace SqlQueryTool
 		Left,
 		Right
 	}
+
+	public class DragDropCellValue
+	{
+		public string ColumnName { get; set; }
+		public string Value { get; set; }
+		public string SqlFormattedValue { get; set; }
+	}
+
 }

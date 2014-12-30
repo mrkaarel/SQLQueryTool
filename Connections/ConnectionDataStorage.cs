@@ -22,7 +22,7 @@ namespace SqlQueryTool.Connections
 				var protectedSettings = ReadFully(storageStream);
 				
 				if (protectedSettings.Length == 0) {
-					return previousSettings;	
+					return previousSettings;
 				}
 
 				var settingsString = STORAGE_ENCODING.GetString(ProtectedData.Unprotect(protectedSettings, null, DataProtectionScope.CurrentUser));

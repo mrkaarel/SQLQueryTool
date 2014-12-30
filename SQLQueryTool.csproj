@@ -81,6 +81,12 @@
     <Compile Include="Forms\ParameterValuesPrompt.Designer.cs">
       <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\QueryEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\QueryEditor.Designer.cs">
+      <DependentUpon>QueryEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\RowCountFilterPrompt.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +104,9 @@
     <Compile Include="Utils\WinFormsHelper.cs" />
     <EmbeddedResource Include="Forms\ParameterValuesPrompt.resx">
       <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\QueryEditor.resx">
+      <DependentUpon>QueryEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RowCountFilterPrompt.resx">
       <DependentUpon>RowCountFilterPrompt.cs</DependentUpon>
