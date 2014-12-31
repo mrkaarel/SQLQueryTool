@@ -34,7 +34,9 @@ namespace SqlQueryTool.Forms
 			this.lblStatusbarInfo = new System.Windows.Forms.ToolStripStatusLabel();
 			this.splMainContent = new System.Windows.Forms.SplitContainer();
 			this.grpDatabaseObjects = new System.Windows.Forms.GroupBox();
+			this.databaseObjectBrowser = new SqlQueryTool.Forms.DatabaseObjectBrowser();
 			this.pnlConnection = new System.Windows.Forms.GroupBox();
+			this.connectionManager = new SqlQueryTool.Forms.ConnectionManager();
 			this.btnDeleteQuery = new System.Windows.Forms.Button();
 			this.btnAddQuery = new System.Windows.Forms.Button();
 			this.btnRunQuery = new System.Windows.Forms.Button();
@@ -45,8 +47,6 @@ namespace SqlQueryTool.Forms
 			this.mniMoveTabLeft = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniMoveTabRight = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCloseTabpage = new System.Windows.Forms.ToolStripMenuItem();
-			this.databaseObjectsViewer = new SqlQueryTool.Forms.DatabaseObjectsViewer();
-			this.connectionManager = new SqlQueryTool.Forms.ConnectionManager();
 			this.statusStrip.SuspendLayout();
 			this.splMainContent.Panel1.SuspendLayout();
 			this.splMainContent.Panel2.SuspendLayout();
@@ -100,7 +100,7 @@ namespace SqlQueryTool.Forms
 			this.grpDatabaseObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.grpDatabaseObjects.Controls.Add(this.databaseObjectsViewer);
+			this.grpDatabaseObjects.Controls.Add(this.databaseObjectBrowser);
 			this.grpDatabaseObjects.Enabled = false;
 			this.grpDatabaseObjects.Location = new System.Drawing.Point(3, 88);
 			this.grpDatabaseObjects.Name = "grpDatabaseObjects";
@@ -108,6 +108,14 @@ namespace SqlQueryTool.Forms
 			this.grpDatabaseObjects.TabIndex = 15;
 			this.grpDatabaseObjects.TabStop = false;
 			this.grpDatabaseObjects.Text = "Andmebaasi objektid";
+			// 
+			// databaseObjectsViewer
+			// 
+			this.databaseObjectBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.databaseObjectBrowser.Location = new System.Drawing.Point(3, 16);
+			this.databaseObjectBrowser.Name = "databaseObjectsViewer";
+			this.databaseObjectBrowser.Size = new System.Drawing.Size(252, 463);
+			this.databaseObjectBrowser.TabIndex = 0;
 			// 
 			// pnlConnection
 			// 
@@ -120,6 +128,14 @@ namespace SqlQueryTool.Forms
 			this.pnlConnection.TabIndex = 13;
 			this.pnlConnection.TabStop = false;
 			this.pnlConnection.Text = "Ühenduse seaded";
+			// 
+			// connectionManager
+			// 
+			this.connectionManager.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.connectionManager.Location = new System.Drawing.Point(3, 16);
+			this.connectionManager.Name = "connectionManager";
+			this.connectionManager.Size = new System.Drawing.Size(252, 60);
+			this.connectionManager.TabIndex = 0;
 			// 
 			// btnDeleteQuery
 			// 
@@ -191,6 +207,7 @@ namespace SqlQueryTool.Forms
 			this.tabQueries.Size = new System.Drawing.Size(608, 520);
 			this.tabQueries.TabIndex = 0;
 			this.tabQueries.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.tabQueries_TabCountChanged);
+			this.tabQueries.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.tabQueries_TabCountChanged);
 			this.tabQueries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tabQueries_MouseClick);
 			// 
 			// appImages
@@ -233,22 +250,6 @@ namespace SqlQueryTool.Forms
 			this.mniCloseTabpage.Size = new System.Drawing.Size(162, 22);
 			this.mniCloseTabpage.Text = "Sulge päring";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
-			// 
-			// databaseObjectsViewer
-			// 
-			this.databaseObjectsViewer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.databaseObjectsViewer.Location = new System.Drawing.Point(3, 16);
-			this.databaseObjectsViewer.Name = "databaseObjectsViewer";
-			this.databaseObjectsViewer.Size = new System.Drawing.Size(252, 463);
-			this.databaseObjectsViewer.TabIndex = 0;
-			// 
-			// connectionManager
-			// 
-			this.connectionManager.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.connectionManager.Location = new System.Drawing.Point(3, 16);
-			this.connectionManager.Name = "connectionManager";
-			this.connectionManager.Size = new System.Drawing.Size(252, 60);
-			this.connectionManager.TabIndex = 0;
 			// 
 			// SQLQueryTool
 			// 
@@ -293,7 +294,7 @@ namespace SqlQueryTool.Forms
 		private System.Windows.Forms.ToolStripMenuItem mniMoveTabLeft;
 		private System.Windows.Forms.ToolStripMenuItem mniMoveTabRight;
 		private ConnectionManager connectionManager;
-		private DatabaseObjectsViewer databaseObjectsViewer;
+		private DatabaseObjectBrowser databaseObjectBrowser;
 
 
     }

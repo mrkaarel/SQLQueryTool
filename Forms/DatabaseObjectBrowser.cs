@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using SqlQueryTool.Connections;
+﻿using SqlQueryTool.Connections;
 using SqlQueryTool.DatabaseObjects;
 using SqlQueryTool.Properties;
+using System;
+using System.Collections.Generic;
 using System.Data.Common;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace SqlQueryTool.Forms
 {
-	public partial class DatabaseObjectsViewer : UserControl
+	public partial class DatabaseObjectBrowser : UserControl
 	{
 		public delegate void NewQueryHandler(string queryTitle, string queryText);
 		public event NewQueryHandler OnNewQueryInitiated;
@@ -30,7 +27,7 @@ namespace SqlQueryTool.Forms
 
 		private ConnectionData currentConnectionData;
 
-		public DatabaseObjectsViewer()
+		public DatabaseObjectBrowser()
 		{
 			InitializeComponent();
 
@@ -40,10 +37,10 @@ namespace SqlQueryTool.Forms
 		public void SetConnectionData(ConnectionData connectionData)
 		{
 			this.currentConnectionData = connectionData;
-			this.FillDatabaseObjects(currentConnectionData);
+			this.LoadDatabaseObjects(currentConnectionData);
 		}
 
-		private void FillDatabaseObjects(ConnectionData connectionData)
+		private void LoadDatabaseObjects(ConnectionData connectionData)
 		{
 			tables = new List<TableInfo>();
 			procs = new List<StoredProc>();
@@ -244,7 +241,7 @@ namespace SqlQueryTool.Forms
 
 		private void btnRefresh_Click(object sender, EventArgs e)
 		{
-			FillDatabaseObjects(currentConnectionData);
+			LoadDatabaseObjects(currentConnectionData);
 		}
 
 		private void chkSearchSPContents_CheckedChanged(object sender, EventArgs e)
@@ -304,12 +301,12 @@ namespace SqlQueryTool.Forms
 			OnNewQueryInitiated(node.Name, new TableDefinition(node.Name, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit.None, String.Format("{0} IN ({1})", values.First().ColumnName, String.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray()))));
 		}
 
-		private void mniShowTableRowCounts_Click(object sender, EventArgs e)
+		private void mniBuildTableRowCountsQuery_Click(object sender, EventArgs e)
 		{
 			OnNewQueryInitiated("Table row counts", QueryBuilder.SystemQueries.GetTableRowCounts());
 		}
 
-		private void mniHideEmptyTables_Click(object sender, EventArgs e)
+		private void mniSetTableRowFilter_Click(object sender, EventArgs e)
 		{
 			var prompt = new RowCountFilterPrompt(Settings_MinimumRowCount);
 			prompt.RowCount = Settings_MinimumRowCount;

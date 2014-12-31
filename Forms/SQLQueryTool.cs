@@ -22,8 +22,8 @@ namespace SqlQueryTool.Forms
 			InitializeComponent();
 
 			connectionManager.OnConnectionInitiated += connectionManager_OnConnectionInitiated;
-			databaseObjectsViewer.OnNewQueryInitiated += databaseObjectsViewer_OnNewQueryInitiated;
-			databaseObjectsViewer.OnStatusBarTextChangeRequested += databaseObjectsViewer_OnStatusBarTextChangeRequested;
+			databaseObjectBrowser.OnNewQueryInitiated += databaseObjectsViewer_OnNewQueryInitiated;
+			databaseObjectBrowser.OnStatusBarTextChangeRequested += databaseObjectsViewer_OnStatusBarTextChangeRequested;
 		}
 
 		private void AddNewQueryPage(string queryText, string tabName = "")
@@ -38,15 +38,13 @@ namespace SqlQueryTool.Forms
 			tpQueryPage.Controls.Add(queryEditor);
 			tabQueries.TabPages.Add(tpQueryPage);
 			tabQueries.SelectedTab = tpQueryPage;
-
-			ToggleCurrentQueryControls(enabled: true);
 		}
 
 		private void ConnectToDatabase(ConnectionData connectionData)
 		{
 			try {
 				currentConnectionData = connectionData;
-				databaseObjectsViewer.SetConnectionData(currentConnectionData);
+				databaseObjectBrowser.SetConnectionData(currentConnectionData);
 				connectionManager.SetConnectionAchieved();
 
 				grpDatabaseObjects.Enabled = true;
@@ -65,36 +63,50 @@ namespace SqlQueryTool.Forms
 			var queryEditor = currentPage.Controls["queryEditor"] as QueryEditor;
 			string queryText = queryEditor.QueryText;
 
-			using (var conn = currentConnectionData.GetOpenConnection()) {
-				var cmd = BuildCommand(conn, queryText);
-				if (cmd == null) {
-					return;
-				}
+			if (!ConfirmQuery(queryText)) {
+				return;
+			}
 
-				if (QueryBuilder.IsSelectQuery(cmd.CommandText)) {
-					var stopWatch = Stopwatch.StartNew();
+			try {
+				using (var conn = currentConnectionData.GetOpenConnection()) {
+					var cmd = BuildCommand(conn, queryText);
+					if (cmd == null) {
+						return;
+					}
 
-					var adapter = DbProviderFactories.GetFactory(currentConnectionData.ProviderName).CreateDataAdapter();
-					adapter.SelectCommand = cmd;
+					if (QueryBuilder.IsSelectQuery(cmd.CommandText)) {
+						var stopWatch = Stopwatch.StartNew();
 
-					var results = new DataTable();
-					adapter.Fill(results);
+						var adapter = DbProviderFactories.GetFactory(currentConnectionData.ProviderName).CreateDataAdapter();
+						adapter.SelectCommand = cmd;
 
-					stopWatch.Stop();
-					decimal resultTime = Decimal.Round(stopWatch.ElapsedMilliseconds / 1000m, 1);
-					lblStatusbarInfo.Text = String.Format("{0} kirjet ({1} sekundit; {2}, {3:HH:mm:ss})", results.Rows.Count, resultTime, currentPage.Text, DateTime.Now);
+						var results = new DataTable();
+						adapter.Fill(results);
 
-					queryEditor.ShowResults(new BindingSource() { DataSource = results });
-				}
-				else {
-					int rowsAffected = cmd.ExecuteNonQuery();
-					if (rowsAffected >= 0) {
-						lblStatusbarInfo.Text = String.Format("{0} kirje{1} muudetud ({2}, {3:HH:mm:ss})", rowsAffected, rowsAffected == 1 ? "" : "t", currentPage.Text, DateTime.Now);
+						stopWatch.Stop();
+						decimal resultTime = Decimal.Round(stopWatch.ElapsedMilliseconds / 1000m, 1);
+						lblStatusbarInfo.Text = String.Format("{0} kirjet ({1} sekundit; {2}, {3:HH:mm:ss})", results.Rows.Count, resultTime, currentPage.Text, DateTime.Now);
+
+						queryEditor.ShowResults(new BindingSource() { DataSource = results });
 					}
 					else {
-						lblStatusbarInfo.Text = String.Format("Käskluse täitmine õnnestus ({0}, {1:HH:mm:ss})", currentPage.Text, DateTime.Now);
+						int rowsAffected = cmd.ExecuteNonQuery();
+						if (rowsAffected >= 0) {
+							lblStatusbarInfo.Text = String.Format("{0} kirje{1} muudetud ({2}, {3:HH:mm:ss})", rowsAffected, rowsAffected == 1 ? "" : "t", currentPage.Text, DateTime.Now);
+						}
+						else {
+							lblStatusbarInfo.Text = String.Format("Käskluse täitmine õnnestus ({0}, {1:HH:mm:ss})", currentPage.Text, DateTime.Now);
+						}
 					}
 				}
+
+				if (QueryBuilder.IsStructureAlteringQuery(queryText)) {
+					databaseObjectBrowser.SetConnectionData(currentConnectionData);
+				}
+			}
+			catch (Exception ex) {
+				lblStatusbarInfo.Text = "";
+				MessageBox.Show(ex.Message, "Viga", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -141,14 +153,6 @@ namespace SqlQueryTool.Forms
 			if (tabQueries.TabPages.Count > 0) {
 				tabQueries.SelectedIndex = Math.Min(closedIndex, tabQueries.TabPages.Count - 1);
 			}
-
-			ToggleCurrentQueryControls(tabQueries.TabPages.Count > 0);
-		}
-
-		private void ToggleCurrentQueryControls(bool enabled)
-		{
-			btnDeleteQuery.Enabled = enabled;
-			btnRunQuery.Enabled = enabled;
 		}
 
 		private string BuildRowUpdateQuery(string tableName, DataGridView dataGridView)
@@ -244,27 +248,17 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
+		private void tabQueries_TabCountChanged(object sender, ControlEventArgs e)
+		{
+			bool enableTabControlButtons = tabQueries.TabPages.Count > 0;
+			btnDeleteQuery.Enabled = enableTabControlButtons;
+			btnRunQuery.Enabled = enableTabControlButtons;
+		}
+
 		private void btnRunQuery_Click(object sender, EventArgs e)
 		{
 			var currentPage = tabQueries.SelectedTab;
-			var queryEditor = currentPage.Controls["queryEditor"] as QueryEditor;
-
-			string queryText = queryEditor.QueryText;
-
-			if (!ConfirmQuery(queryText)) {
-				return;
-			}
-
-			try {
-				RunQuery(currentPage);
-				if (QueryBuilder.IsStructureAlteringQuery(queryText)) {
-					databaseObjectsViewer.SetConnectionData(currentConnectionData);
-				}
-			}
-			catch (Exception ex) {
-				lblStatusbarInfo.Text = "";
-				MessageBox.Show(ex.Message, "Viga", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
+			RunQuery(currentPage);
 		}
 
 		private void queryEditor_OnRowUpdate(DataGridView dataGridView)
@@ -289,10 +283,5 @@ namespace SqlQueryTool.Forms
 		}
 
 		#endregion
-
-		private void tabQueries_TabCountChanged(object sender, ControlEventArgs e)
-		{
-			MessageBox.Show("yup");
-		}
 	}
 }
