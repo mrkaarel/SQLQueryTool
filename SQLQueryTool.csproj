@@ -81,6 +81,12 @@
     <Compile Include="Forms\ConnectionManager.Designer.cs">
       <DependentUpon>ConnectionManager.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\DatabaseObjectsViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\DatabaseObjectsViewer.Designer.cs">
+      <DependentUpon>DatabaseObjectsViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ParameterValuesPrompt.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -110,6 +116,9 @@
     <Compile Include="Utils\WinFormsHelper.cs" />
     <EmbeddedResource Include="Forms\ConnectionManager.resx">
       <DependentUpon>ConnectionManager.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DatabaseObjectsViewer.resx">
+      <DependentUpon>DatabaseObjectsViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ParameterValuesPrompt.resx">
       <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>

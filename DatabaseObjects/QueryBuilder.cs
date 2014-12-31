@@ -85,7 +85,7 @@ namespace SqlQueryTool.DatabaseObjects
 
 		public static string BuildGrantExecuteOnSP(string spName, string userName = "xxx")
 		{
-			return String.Format("GRANT EXECUTE ON {0} TO {1}", spName, userName);
+			return String.Format("GRANT EXECUTE {0}ON {1} {0}TO {2}", Environment.NewLine, spName, userName);
 		}
 
 		public static bool IsCrudQuery(string queryText)
@@ -142,7 +142,18 @@ namespace SqlQueryTool.DatabaseObjects
 
 			public static string GetViewList()
 			{
-				return "SELECT o.name, m.definition FROM sys.objects o JOIN sys.sql_modules m ON (m.object_id = o.object_id) WHERE o.type = 'V' AND m.definition IS NOT NULL ORDER BY o.name";
+				return @"
+					SELECT 
+						o.name, 
+						m.definition 
+					FROM 
+						sys.objects o 
+					LEFT JOIN 
+						sys.sql_modules m ON (m.object_id = o.object_id) 
+					WHERE 
+						o.type = 'V'
+					ORDER BY 
+						o.name";
 			}
 
 			public static string GetTableRowCounts()
@@ -150,9 +161,9 @@ namespace SqlQueryTool.DatabaseObjects
 				return String.Format("SELECT {0}\tt.name \"Tabel\",{0}\tp.rows \"Ridasid\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine);
 			}
 
-			public static string FindColumns(string searchString = "xxx")
+			public static string FindColumns()
 			{
-				return String.Format("SELECT {0}\ttables.name TableName, {0}\tcolumns.name ColumnName, {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')'{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE '%{1}%' {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine, searchString);
+				return String.Format("SELECT {0}\ttables.name TableName, {0}\tcolumns.name ColumnName, {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')'{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE @SearchString {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine);
 			}
 		}
 
