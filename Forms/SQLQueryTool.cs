@@ -26,20 +26,6 @@ namespace SqlQueryTool.Forms
 			databaseObjectBrowser.OnStatusBarTextChangeRequested += databaseObjectsViewer_OnStatusBarTextChangeRequested;
 		}
 
-		private void AddNewQueryPage(string queryText, string tabName = "")
-		{
-			var queryEditor = new QueryEditor() { Name = "queryEditor", Dock = DockStyle.Fill };
-			queryEditor.SetQueryText(queryText);
-			queryEditor.OnRowUpdate += queryEditor_OnRowUpdate;
-
-			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Päring {0}", tabQueries.TabPages.Count + 1) : tabName;
-			var tpQueryPage = new TabPage(tabName) { ImageIndex = 0 };
-
-			tpQueryPage.Controls.Add(queryEditor);
-			tabQueries.TabPages.Add(tpQueryPage);
-			tabQueries.SelectedTab = tpQueryPage;
-		}
-
 		private void ConnectToDatabase(ConnectionData connectionData)
 		{
 			try {
@@ -56,6 +42,19 @@ namespace SqlQueryTool.Forms
 			catch (Exception ex) {
 				MessageBox.Show(String.Format("Viga andmebaasiühendusega:\n{0}", ex.Message), "Viga andmebaasiühendusega", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
+		}
+
+		private void AddNewQueryPage(string queryText, string tabName = "")
+		{
+			var queryEditor = new QueryEditor(queryText) { Name = "queryEditor", Dock = DockStyle.Fill };
+			queryEditor.OnRowUpdate += queryEditor_OnRowUpdate;
+
+			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Päring {0}", tabQueries.TabPages.Count + 1) : tabName;
+			var tpQueryPage = new TabPage(tabName) { ImageIndex = 0 };
+
+			tpQueryPage.Controls.Add(queryEditor);
+			tabQueries.TabPages.Add(tpQueryPage);
+			tabQueries.SelectedTab = tpQueryPage;
 		}
 
 		private void RunQuery(TabPage currentPage)
@@ -155,25 +154,6 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
-		private string BuildRowUpdateQuery(string tableName, DataGridView dataGridView)
-		{
-			var selectedCells = dataGridView.GetSelectedCells();
-
-			var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, tableName));
-
-			foreach (var cell in selectedCells.OrderBy(c => c.ColumnIndex)) {
-				string columnName = cell.OwningColumn.Name;
-				queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, columnName, QueryEditor.GetSQLFormattedValue(cell));
-			}
-			queryText.Remove(queryText.Length - 2, 2);
-
-			var firstCellInRow = selectedCells.First().OwningRow.Cells[0];
-
-			queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, firstCellInRow.OwningColumn.Name, QueryEditor.GetSQLFormattedValue(firstCellInRow));
-
-			return queryText.ToString();
-		}
-
 		#region EventHandlers
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -261,10 +241,10 @@ namespace SqlQueryTool.Forms
 			RunQuery(currentPage);
 		}
 
-		private void queryEditor_OnRowUpdate(DataGridView dataGridView)
+		private void queryEditor_OnRowUpdate(IEnumerable<SqlCellValue> updateCells, SqlCellValue filterCell)
 		{
 			string tableName = tabQueries.SelectedTab.Text;
-			AddNewQueryPage(BuildRowUpdateQuery(tableName, dataGridView), String.Format("{0} (u)", tableName));
+			AddNewQueryPage(QueryBuilder.BuildRowUpdateQuery(tableName, updateCells, filterCell), String.Format("{0} (u)", tableName));
 		}
 
 		private void connectionManager_OnConnectionInitiated(ConnectionData connectionData)

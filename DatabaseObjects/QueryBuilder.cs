@@ -78,6 +78,21 @@ namespace SqlQueryTool.DatabaseObjects
 			return queryText.ToString();
 		}
 
+		public static string BuildRowUpdateQuery(string tableName, IEnumerable<SqlCellValue> updateCells, SqlCellValue filterCell)
+		{
+			var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, tableName));
+
+			foreach (var cell in updateCells) {
+				string columnName = cell.ColumnName;
+				queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, cell.ColumnName, cell.SqlFormattedValue);
+			}
+			queryText.Remove(queryText.Length - 2, 2);
+
+			queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, filterCell.ColumnName, filterCell.SqlFormattedValue);
+
+			return queryText.ToString();
+		}
+
 		public static string BuildDeleteQuery(this TableDefinition table)
 		{
 			return String.Format("DELETE FROM {0}\t{1}{0}WHERE{0}\t{2}", Environment.NewLine, table.Name, GetWhereClause(table));

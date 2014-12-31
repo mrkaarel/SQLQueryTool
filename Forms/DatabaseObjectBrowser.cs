@@ -214,7 +214,7 @@ namespace SqlQueryTool.Forms
 
 		private void txtSearch_DragEnter(object sender, DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
+			if (e.Data.GetDataPresent(DataFormats.Text) || e.Data.GetDataPresent(typeof(List<SqlCellValue>))) {
 				e.Effect = DragDropEffects.Copy;
 			}
 			else {
@@ -227,8 +227,8 @@ namespace SqlQueryTool.Forms
 			if (e.Data.GetDataPresent(DataFormats.Text)) {
 				txtSearch.Text = e.Data.GetData(DataFormats.Text).ToString();
 			}
-			if (e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
-				var values = e.Data.GetData(typeof(List<DragDropCellValue>)) as List<DragDropCellValue>;
+			if (e.Data.GetDataPresent(typeof(List<SqlCellValue>))) {
+				var values = e.Data.GetData(typeof(List<SqlCellValue>)) as List<SqlCellValue>;
 				txtSearch.Text = values.First().Value;
 			}
 		}
@@ -285,7 +285,7 @@ namespace SqlQueryTool.Forms
 		{
 			var node = trvDatabaseObjects.GetHoverNode(e.X, e.Y);
 
-			if (node != null && node.Parent != null && node.Parent.Name == "Tables" && e.Data.GetDataPresent(typeof(List<DragDropCellValue>))) {
+			if (node != null && node.Parent != null && node.Parent.Name == "Tables" && e.Data.GetDataPresent(typeof(List<SqlCellValue>))) {
 				e.Effect = DragDropEffects.Copy;
 			}
 			else {
@@ -297,7 +297,7 @@ namespace SqlQueryTool.Forms
 		{
 			var node = trvDatabaseObjects.GetHoverNode(e.X, e.Y);
 
-			var values = e.Data.GetData(typeof(List<DragDropCellValue>)) as List<DragDropCellValue>;
+			var values = e.Data.GetData(typeof(List<SqlCellValue>)) as List<SqlCellValue>;
 			OnNewQueryInitiated(node.Name, new TableDefinition(node.Name, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit.None, String.Format("{0} IN ({1})", values.First().ColumnName, String.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray()))));
 		}
 

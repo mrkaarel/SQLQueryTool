@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SqlQueryTool.DatabaseObjects;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -71,6 +72,20 @@ namespace SqlQueryTool
 			return dataGridView.SelectedCells.Cast<DataGridViewCell>();
 		}
 
+		public static SqlCellValue ToSqlCellValue(this DataGridViewCell cell)
+		{
+			string value = cell.FormattedValue.ToString();
+			string valueTypeString = cell.ValueType.ToString();
+
+			bool useQuotes = (valueTypeString == "System.String" || valueTypeString == "System.DateTime" || valueTypeString == "System.Guid");
+			if (valueTypeString == "System.Boolean") {
+				value = value == Boolean.TrueString ? "1" : "0";
+			}
+			string sqlFormattedValue = String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
+
+			return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue);
+		}
+
 		public static TreeNode GetHoverNode(this TreeView treeView, int x, int y)
 		{
 			var pos = treeView.PointToClient(new Point(x, y));
@@ -90,12 +105,4 @@ namespace SqlQueryTool
 		Left,
 		Right
 	}
-
-	public class DragDropCellValue
-	{
-		public string ColumnName { get; set; }
-		public string Value { get; set; }
-		public string SqlFormattedValue { get; set; }
-	}
-
 }

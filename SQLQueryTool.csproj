@@ -75,6 +75,7 @@
     <Compile Include="Connections\ConnectionData.cs" />
     <Compile Include="DatabaseObjects\CommandParameter.cs" />
     <Compile Include="DatabaseObjects\QueryBuilder.cs" />
+    <Compile Include="DatabaseObjects\SqlCellValue.cs" />
     <Compile Include="Forms\ConnectionManager.cs">
       <SubType>UserControl</SubType>
     </Compile>

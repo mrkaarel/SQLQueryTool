@@ -1,5 +1,7 @@
 ﻿using ScintillaNet;
+using SqlQueryTool.DatabaseObjects;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -8,30 +10,26 @@ namespace SqlQueryTool.Forms
 {
 	public partial class QueryEditor : UserControl
 	{
-		public delegate void RowUpdateHandler(DataGridView dataGridView);
+		public delegate void RowUpdateHandler(IEnumerable<SqlCellValue> updateCells, SqlCellValue filterCell);
 		public event RowUpdateHandler OnRowUpdate;
 
-		public QueryEditor()
+		public QueryEditor(string queryText)
 		{
 			InitializeComponent();
 
 			this.splQuery.Panel2Collapsed = true;
+			BuildScintillaEditor(queryText);
 		}
 
-		public static string GetSQLFormattedValue(DataGridViewCell cell)
+		public string QueryText
 		{
-			string cellType = cell.ValueType.ToString();
-			string value = cell.FormattedValue.ToString();
-
-			bool useQuotes = (cellType == "System.String" || cellType == "System.DateTime" || cellType == "System.Guid");
-			if (cellType == "System.Boolean") {
-				value = (bool)cell.Value ? "1" : "0";
+			get
+			{
+				return (this.splQuery.Panel1.Controls["txtQueryText"] as Scintilla).Text;
 			}
-
-			return String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
 		}
 
-		public void SetQueryText(string queryText)
+		private void BuildScintillaEditor(string queryText)
 		{
 			var txtQueryText = new Scintilla();
 			txtQueryText.Name = "txtQueryText";
@@ -44,13 +42,6 @@ namespace SqlQueryTool.Forms
 			txtQueryText.Scrolling.ScrollBars = ScrollBars.Both;
 
 			splQuery.Panel1.Controls.Add(txtQueryText);
-		}
-
-		public string QueryText
-		{
-			get {
-				return (this.splQuery.Panel1.Controls["txtQueryText"] as Scintilla).Text;
-			}
 		}
 
 		public void ShowResults(BindingSource bindingSource)
@@ -72,8 +63,7 @@ namespace SqlQueryTool.Forms
 			}
 
 			var selectedCells = resultsTable.GetSelectedCells();
-			string columnName = selectedCells.First().OwningColumn.Name;
-			var dragAndDropValues = selectedCells.OrderBy(c => c.RowIndex).Select(c => new DragDropCellValue() { ColumnName = columnName, Value = c.FormattedValue.ToString(), SqlFormattedValue = GetSQLFormattedValue(c) }).ToList();
+			var dragAndDropValues = selectedCells.OrderBy(c => c.RowIndex).Select(c => c.ToSqlCellValue()).ToList();
 
 			resultsTable.DoDragDrop(dragAndDropValues, DragDropEffects.Copy);
 		}
@@ -84,8 +74,8 @@ namespace SqlQueryTool.Forms
 				return;
 			}
 
-			var selectedCells = resultsTable.GetSelectedCells();
-			string result = String.Join(", ", selectedCells.OrderBy(c => c.RowIndex).Select(GetSQLFormattedValue).ToArray());
+			var selectedCells = resultsTable.GetSelectedCells().OrderBy(c => c.RowIndex).Select(c => c.ToSqlCellValue());
+			string result = String.Join(", ", selectedCells.Select(c => c.SqlFormattedValue).ToArray());
 			WinFormsHelper.CopyTextToClipboard(result);
 		}
 
@@ -139,7 +129,10 @@ namespace SqlQueryTool.Forms
 
 		private void mniCreateRowUpdateQuery_Click(object sender, EventArgs e)
 		{
-			OnRowUpdate(dgResults);
+			var updateCells = dgResults.GetSelectedCells().OrderBy(c => c.ColumnIndex).Select(c => c.ToSqlCellValue());
+			var filterCell = dgResults.GetSelectedCells().First().OwningRow.Cells[0].ToSqlCellValue();
+
+			OnRowUpdate(updateCells, filterCell);
 		}
 	}
 }
