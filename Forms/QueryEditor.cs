@@ -1,5 +1,6 @@
 ﻿using ScintillaNet;
 using SqlQueryTool.DatabaseObjects;
+using SqlQueryTool.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -29,6 +30,18 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
+		public void ShowResults(BindingSource bindingSource)
+		{
+			splQuery.Panel2Collapsed = false;
+
+			dgResults.Columns.Clear();
+			dgResults.AutoGenerateColumns = true;
+			dgResults.SuspendLayout();
+			dgResults.DataSource = bindingSource;
+			dgResults.AutoResizeColumns();
+			dgResults.ResumeLayout();
+		}
+
 		private void BuildScintillaEditor(string queryText)
 		{
 			var txtQueryText = new Scintilla();
@@ -44,27 +57,13 @@ namespace SqlQueryTool.Forms
 			splQuery.Panel1.Controls.Add(txtQueryText);
 		}
 
-		public void ShowResults(BindingSource bindingSource)
-		{
-			splQuery.Panel2Collapsed = false;
-
-			dgResults.Columns.Clear();
-			dgResults.AutoGenerateColumns = true;
-			dgResults.SuspendLayout();
-			dgResults.DataSource = bindingSource;
-			dgResults.AutoResizeColumns();
-			dgResults.ResumeLayout();
-		}
-
 		private void StartResultsTableDrag(DataGridView resultsTable)
 		{
 			if (!resultsTable.IsSelectionColumn()) {
 				return;
 			}
 
-			var selectedCells = resultsTable.GetSelectedCells();
-			var dragAndDropValues = selectedCells.OrderBy(c => c.RowIndex).Select(c => c.ToSqlCellValue()).ToList();
-
+			var dragAndDropValues = resultsTable.GetSelectedCells().OrderBy(c => c.RowIndex).Select(c => c.ToSqlCellValue()).ToList();
 			resultsTable.DoDragDrop(dragAndDropValues, DragDropEffects.Copy);
 		}
 

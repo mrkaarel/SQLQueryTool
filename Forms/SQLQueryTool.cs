@@ -1,12 +1,12 @@
 using SqlQueryTool.Connections;
 using SqlQueryTool.DatabaseObjects;
+using SqlQueryTool.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SqlQueryTool.Forms
@@ -159,8 +159,8 @@ namespace SqlQueryTool.Forms
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 		{
 			if (keyData == (Keys.Control | Keys.W)) {
-				if (btnDeleteQuery.Enabled) {
-					btnDeleteQuery.PerformClick(); ;
+				if (btnCloseQuery.Enabled) {
+					btnCloseQuery.PerformClick(); ;
 				}
 				return true;
 			}
@@ -183,7 +183,7 @@ namespace SqlQueryTool.Forms
 			AddNewQueryPage(String.Empty);
 		}
 
-		private void btnDeleteQuery_Click(object sender, EventArgs e)
+		private void btnCloseQuery_Click(object sender, EventArgs e)
 		{
 			if (tabQueries.SelectedTab != null) {
 				CloseQueryPage(tabQueries.SelectedTab);
@@ -197,25 +197,12 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
-		private void mniMoveTabLeft_Click(object sender, EventArgs e)
-		{
-			tabQueries.MoveTabPage(tabQueries.Tag as TabPage, MoveDirection.Left);
-		}
-
-		private void mniMoveTabRight_Click(object sender, EventArgs e)
-		{
-			tabQueries.MoveTabPage(tabQueries.Tag as TabPage, MoveDirection.Right);
-		}
-
 		private void tabQueries_MouseClick(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Right) {
 				for (int i = 0; i < tabQueries.TabCount; i++) {
 					if (tabQueries.GetTabRect(i).Contains(e.Location)) {
 						mniCloseTabpage.Text = String.Format("Sulge {0}", tabQueries.TabPages[i].Text);
-
-						mniMoveTabLeft.Enabled = i > 0;
-						mniMoveTabRight.Enabled = i < tabQueries.TabCount - 1;
 
 						tabQueries.Tag = tabQueries.TabPages[i];
 						cmnTabpage.Show(tabQueries, e.Location);
@@ -231,7 +218,7 @@ namespace SqlQueryTool.Forms
 		private void tabQueries_TabCountChanged(object sender, ControlEventArgs e)
 		{
 			bool enableTabControlButtons = tabQueries.TabPages.Count > 0;
-			btnDeleteQuery.Enabled = enableTabControlButtons;
+			btnCloseQuery.Enabled = enableTabControlButtons;
 			btnRunQuery.Enabled = enableTabControlButtons;
 		}
 

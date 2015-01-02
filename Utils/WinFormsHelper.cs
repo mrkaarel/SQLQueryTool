@@ -6,31 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SqlQueryTool
+namespace SqlQueryTool.Utils
 {
 	public static class WinFormsHelper
 	{
-		public static void MoveTabPage(this TabControl tabControl, TabPage tabPage, MoveDirection direction)
-		{
-			int selectedIndex = tabControl.SelectedIndex;
-
-			for (int i = 0; i < tabControl.TabCount; i++) {
-				if (tabControl.TabPages[i] == tabPage) {
-					int newIdx = direction == MoveDirection.Left ? i - 1 : i + 1;
-
-					tabControl.TabPages.Remove(tabPage);
-					tabControl.TabPages.Insert(newIdx, tabPage);
-
-					// keep active tab active
-					if (selectedIndex == i) {
-						tabControl.SelectedIndex = newIdx;
-					}
-
-					break;
-				}
-			}
-		}
-
 		public static void ToggleColumnNamesCopy(this DataGridView dataGridView)
 		{
 			if (dataGridView.IsSelectionColumn()) {
@@ -98,11 +77,5 @@ namespace SqlQueryTool
 		{
 			Clipboard.SetText(text);
 		}
-	}
-	
-	public enum MoveDirection
-	{
-		Left,
-		Right
 	}
 }

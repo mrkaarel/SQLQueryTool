@@ -1,33 +1,33 @@
+using SqlQueryTool.Utils;
 namespace SqlQueryTool.Forms
 {
-    partial class SQLQueryTool
-    {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
-        private System.ComponentModel.IContainer components = null;
+	partial class SQLQueryTool
+	{
+		/// <summary>
+		/// Required designer variable.
+		/// </summary>
+		private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+		/// <summary>
+		/// Clean up any resources being used.
+		/// </summary>
+		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && (components != null)) {
+				components.Dispose();
+			}
+			base.Dispose(disposing);
+		}
 
-        #region Windows Form Designer generated code
+		#region Windows Form Designer generated code
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		private void InitializeComponent()
+		{
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQLQueryTool));
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
@@ -37,15 +37,13 @@ namespace SqlQueryTool.Forms
 			this.databaseObjectBrowser = new SqlQueryTool.Forms.DatabaseObjectBrowser();
 			this.pnlConnection = new System.Windows.Forms.GroupBox();
 			this.connectionManager = new SqlQueryTool.Forms.ConnectionManager();
-			this.btnDeleteQuery = new System.Windows.Forms.Button();
+			this.btnCloseQuery = new System.Windows.Forms.Button();
 			this.btnAddQuery = new System.Windows.Forms.Button();
 			this.btnRunQuery = new System.Windows.Forms.Button();
 			this.grpQueries = new System.Windows.Forms.GroupBox();
-			this.tabQueries = new System.Windows.Forms.TabControl();
+			this.tabQueries = new SqlQueryTool.Utils.DraggableTabControl();
 			this.appImages = new System.Windows.Forms.ImageList(this.components);
 			this.cmnTabpage = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.mniMoveTabLeft = new System.Windows.Forms.ToolStripMenuItem();
-			this.mniMoveTabRight = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCloseTabpage = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip.SuspendLayout();
 			this.splMainContent.Panel1.SuspendLayout();
@@ -86,7 +84,7 @@ namespace SqlQueryTool.Forms
 			// 
 			// splMainContent.Panel2
 			// 
-			this.splMainContent.Panel2.Controls.Add(this.btnDeleteQuery);
+			this.splMainContent.Panel2.Controls.Add(this.btnCloseQuery);
 			this.splMainContent.Panel2.Controls.Add(this.btnAddQuery);
 			this.splMainContent.Panel2.Controls.Add(this.btnRunQuery);
 			this.splMainContent.Panel2.Controls.Add(this.grpQueries);
@@ -109,11 +107,11 @@ namespace SqlQueryTool.Forms
 			this.grpDatabaseObjects.TabStop = false;
 			this.grpDatabaseObjects.Text = "Andmebaasi objektid";
 			// 
-			// databaseObjectsViewer
+			// databaseObjectBrowser
 			// 
 			this.databaseObjectBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.databaseObjectBrowser.Location = new System.Drawing.Point(3, 16);
-			this.databaseObjectBrowser.Name = "databaseObjectsViewer";
+			this.databaseObjectBrowser.Name = "databaseObjectBrowser";
 			this.databaseObjectBrowser.Size = new System.Drawing.Size(252, 463);
 			this.databaseObjectBrowser.TabIndex = 0;
 			// 
@@ -137,20 +135,20 @@ namespace SqlQueryTool.Forms
 			this.connectionManager.Size = new System.Drawing.Size(252, 60);
 			this.connectionManager.TabIndex = 0;
 			// 
-			// btnDeleteQuery
+			// btnCloseQuery
 			// 
-			this.btnDeleteQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.btnDeleteQuery.Enabled = false;
-			this.btnDeleteQuery.Image = global::SqlQueryTool.Properties.Resources.script_delete;
-			this.btnDeleteQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnDeleteQuery.Location = new System.Drawing.Point(102, 543);
-			this.btnDeleteQuery.Name = "btnDeleteQuery";
-			this.btnDeleteQuery.Size = new System.Drawing.Size(94, 26);
-			this.btnDeleteQuery.TabIndex = 3;
-			this.btnDeleteQuery.Text = "Sulge päring";
-			this.btnDeleteQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.btnDeleteQuery.UseVisualStyleBackColor = true;
-			this.btnDeleteQuery.Click += new System.EventHandler(this.btnDeleteQuery_Click);
+			this.btnCloseQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.btnCloseQuery.Enabled = false;
+			this.btnCloseQuery.Image = global::SqlQueryTool.Properties.Resources.script_delete;
+			this.btnCloseQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.btnCloseQuery.Location = new System.Drawing.Point(102, 543);
+			this.btnCloseQuery.Name = "btnCloseQuery";
+			this.btnCloseQuery.Size = new System.Drawing.Size(94, 26);
+			this.btnCloseQuery.TabIndex = 3;
+			this.btnCloseQuery.Text = "Sulge päring";
+			this.btnCloseQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.btnCloseQuery.UseVisualStyleBackColor = true;
+			this.btnCloseQuery.Click += new System.EventHandler(this.btnCloseQuery_Click);
 			// 
 			// btnAddQuery
 			// 
@@ -197,6 +195,7 @@ namespace SqlQueryTool.Forms
 			// tabQueries
 			// 
 			this.tabQueries.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+			this.tabQueries.AllowDrop = true;
 			this.tabQueries.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -219,35 +218,17 @@ namespace SqlQueryTool.Forms
 			// cmnTabpage
 			// 
 			this.cmnTabpage.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniMoveTabLeft,
-            this.mniMoveTabRight,
             this.mniCloseTabpage});
 			this.cmnTabpage.Name = "cmnTabpage";
 			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.cmnTabpage.Size = new System.Drawing.Size(163, 70);
-			// 
-			// mniMoveTabLeft
-			// 
-			this.mniMoveTabLeft.Image = global::SqlQueryTool.Properties.Resources.arrow_left;
-			this.mniMoveTabLeft.Name = "mniMoveTabLeft";
-			this.mniMoveTabLeft.Size = new System.Drawing.Size(162, 22);
-			this.mniMoveTabLeft.Text = "Nihuta vasakule";
-			this.mniMoveTabLeft.Click += new System.EventHandler(this.mniMoveTabLeft_Click);
-			// 
-			// mniMoveTabRight
-			// 
-			this.mniMoveTabRight.Image = global::SqlQueryTool.Properties.Resources.arrow_right;
-			this.mniMoveTabRight.Name = "mniMoveTabRight";
-			this.mniMoveTabRight.Size = new System.Drawing.Size(162, 22);
-			this.mniMoveTabRight.Text = "Nihuta paremale";
-			this.mniMoveTabRight.Click += new System.EventHandler(this.mniMoveTabRight_Click);
+			this.cmnTabpage.Size = new System.Drawing.Size(153, 48);
 			// 
 			// mniCloseTabpage
 			// 
 			this.mniCloseTabpage.Image = global::SqlQueryTool.Properties.Resources.cross;
 			this.mniCloseTabpage.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
 			this.mniCloseTabpage.Name = "mniCloseTabpage";
-			this.mniCloseTabpage.Size = new System.Drawing.Size(162, 22);
+			this.mniCloseTabpage.Size = new System.Drawing.Size(152, 22);
 			this.mniCloseTabpage.Text = "Sulge päring";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
 			// 
@@ -274,29 +255,27 @@ namespace SqlQueryTool.Forms
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
-        }
+		}
 
-        #endregion
+		#endregion
 
-        private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel lblStatusbarInfo;
+		private System.Windows.Forms.StatusStrip statusStrip;
+		private System.Windows.Forms.ToolStripStatusLabel lblStatusbarInfo;
 		private System.Windows.Forms.SplitContainer splMainContent;
-        private System.Windows.Forms.GroupBox grpDatabaseObjects;
+		private System.Windows.Forms.GroupBox grpDatabaseObjects;
 		private System.Windows.Forms.GroupBox pnlConnection;
-        private System.Windows.Forms.GroupBox grpQueries;
-        private System.Windows.Forms.TabControl tabQueries;
-        private System.Windows.Forms.Button btnAddQuery;
-        private System.Windows.Forms.Button btnRunQuery;
-        private System.Windows.Forms.Button btnDeleteQuery;
-        private System.Windows.Forms.ImageList appImages;
-        private System.Windows.Forms.ContextMenuStrip cmnTabpage;
+		private System.Windows.Forms.GroupBox grpQueries;
+		private System.Windows.Forms.Button btnAddQuery;
+		private System.Windows.Forms.Button btnRunQuery;
+		private System.Windows.Forms.Button btnCloseQuery;
+		private System.Windows.Forms.ImageList appImages;
+		private System.Windows.Forms.ContextMenuStrip cmnTabpage;
 		private System.Windows.Forms.ToolStripMenuItem mniCloseTabpage;
-		private System.Windows.Forms.ToolStripMenuItem mniMoveTabLeft;
-		private System.Windows.Forms.ToolStripMenuItem mniMoveTabRight;
 		private ConnectionManager connectionManager;
 		private DatabaseObjectBrowser databaseObjectBrowser;
+		private DraggableTabControl tabQueries;
 
 
-    }
+	}
 }
 
