@@ -208,6 +208,7 @@ namespace SqlQueryTool.Forms
 			this.tabQueries.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.tabQueries_TabCountChanged);
 			this.tabQueries.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.tabQueries_TabCountChanged);
 			this.tabQueries.MouseClick += new System.Windows.Forms.MouseEventHandler(this.tabQueries_MouseClick);
+			this.tabQueries.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.tabQueries_MouseDoubleClick);
 			// 
 			// appImages
 			// 
@@ -221,14 +222,14 @@ namespace SqlQueryTool.Forms
             this.mniCloseTabpage});
 			this.cmnTabpage.Name = "cmnTabpage";
 			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.cmnTabpage.Size = new System.Drawing.Size(153, 48);
+			this.cmnTabpage.Size = new System.Drawing.Size(141, 26);
 			// 
 			// mniCloseTabpage
 			// 
 			this.mniCloseTabpage.Image = global::SqlQueryTool.Properties.Resources.cross;
 			this.mniCloseTabpage.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
 			this.mniCloseTabpage.Name = "mniCloseTabpage";
-			this.mniCloseTabpage.Size = new System.Drawing.Size(152, 22);
+			this.mniCloseTabpage.Size = new System.Drawing.Size(140, 22);
 			this.mniCloseTabpage.Text = "Sulge päring";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
 			// 

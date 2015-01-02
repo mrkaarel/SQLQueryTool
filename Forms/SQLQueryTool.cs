@@ -215,6 +215,15 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
+		private void tabQueries_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			var tabRenamePrompt = new TabRenamePrompt(tabQueries.SelectedTab.Text);
+
+			if (tabRenamePrompt.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+				tabQueries.SelectedTab.Text = tabRenamePrompt.TabText;
+			}
+		}
+
 		private void tabQueries_TabCountChanged(object sender, ControlEventArgs e)
 		{
 			bool enableTabControlButtons = tabQueries.TabPages.Count > 0;
