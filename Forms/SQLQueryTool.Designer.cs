@@ -105,7 +105,7 @@ namespace SqlQueryTool.Forms
 			this.grpDatabaseObjects.Size = new System.Drawing.Size(258, 482);
 			this.grpDatabaseObjects.TabIndex = 15;
 			this.grpDatabaseObjects.TabStop = false;
-			this.grpDatabaseObjects.Text = "Andmebaasi objektid";
+			this.grpDatabaseObjects.Text = "Database objects";
 			// 
 			// databaseObjectBrowser
 			// 
@@ -125,7 +125,7 @@ namespace SqlQueryTool.Forms
 			this.pnlConnection.Size = new System.Drawing.Size(258, 79);
 			this.pnlConnection.TabIndex = 13;
 			this.pnlConnection.TabStop = false;
-			this.pnlConnection.Text = "Ühenduse seaded";
+			this.pnlConnection.Text = "Connection settings";
 			// 
 			// connectionManager
 			// 
@@ -143,9 +143,9 @@ namespace SqlQueryTool.Forms
 			this.btnCloseQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.btnCloseQuery.Location = new System.Drawing.Point(102, 543);
 			this.btnCloseQuery.Name = "btnCloseQuery";
-			this.btnCloseQuery.Size = new System.Drawing.Size(94, 26);
+			this.btnCloseQuery.Size = new System.Drawing.Size(90, 26);
 			this.btnCloseQuery.TabIndex = 3;
-			this.btnCloseQuery.Text = "Sulge päring";
+			this.btnCloseQuery.Text = "Close query";
 			this.btnCloseQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnCloseQuery.UseVisualStyleBackColor = true;
 			this.btnCloseQuery.Click += new System.EventHandler(this.btnCloseQuery_Click);
@@ -159,7 +159,7 @@ namespace SqlQueryTool.Forms
 			this.btnAddQuery.Name = "btnAddQuery";
 			this.btnAddQuery.Size = new System.Drawing.Size(93, 26);
 			this.btnAddQuery.TabIndex = 2;
-			this.btnAddQuery.Text = "Uus päring...";
+			this.btnAddQuery.Text = "New query…";
 			this.btnAddQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnAddQuery.UseVisualStyleBackColor = true;
 			this.btnAddQuery.Click += new System.EventHandler(this.btnAddQuery_Click);
@@ -170,11 +170,11 @@ namespace SqlQueryTool.Forms
 			this.btnRunQuery.Enabled = false;
 			this.btnRunQuery.Image = global::SqlQueryTool.Properties.Resources.script_go;
 			this.btnRunQuery.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnRunQuery.Location = new System.Drawing.Point(518, 543);
+			this.btnRunQuery.Location = new System.Drawing.Point(531, 543);
 			this.btnRunQuery.Name = "btnRunQuery";
-			this.btnRunQuery.Size = new System.Drawing.Size(96, 26);
+			this.btnRunQuery.Size = new System.Drawing.Size(83, 26);
 			this.btnRunQuery.TabIndex = 1;
-			this.btnRunQuery.Text = "Käivita päring";
+			this.btnRunQuery.Text = "Run query";
 			this.btnRunQuery.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnRunQuery.UseVisualStyleBackColor = true;
 			this.btnRunQuery.Click += new System.EventHandler(this.btnRunQuery_Click);
@@ -190,7 +190,7 @@ namespace SqlQueryTool.Forms
 			this.grpQueries.Size = new System.Drawing.Size(614, 536);
 			this.grpQueries.TabIndex = 0;
 			this.grpQueries.TabStop = false;
-			this.grpQueries.Text = "Päringud";
+			this.grpQueries.Text = "Queries";
 			// 
 			// tabQueries
 			// 
@@ -222,15 +222,15 @@ namespace SqlQueryTool.Forms
             this.mniCloseTabpage});
 			this.cmnTabpage.Name = "cmnTabpage";
 			this.cmnTabpage.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-			this.cmnTabpage.Size = new System.Drawing.Size(141, 26);
+			this.cmnTabpage.Size = new System.Drawing.Size(137, 26);
 			// 
 			// mniCloseTabpage
 			// 
 			this.mniCloseTabpage.Image = global::SqlQueryTool.Properties.Resources.cross;
 			this.mniCloseTabpage.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
 			this.mniCloseTabpage.Name = "mniCloseTabpage";
-			this.mniCloseTabpage.Size = new System.Drawing.Size(140, 22);
-			this.mniCloseTabpage.Text = "Sulge päring";
+			this.mniCloseTabpage.Size = new System.Drawing.Size(136, 22);
+			this.mniCloseTabpage.Text = "Close query";
 			this.mniCloseTabpage.Click += new System.EventHandler(this.mniCloseTabpage_Click);
 			// 
 			// SQLQueryTool

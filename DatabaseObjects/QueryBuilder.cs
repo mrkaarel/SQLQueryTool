@@ -173,12 +173,12 @@ namespace SqlQueryTool.DatabaseObjects
 
 			public static string GetTableRowCounts()
 			{
-				return String.Format("SELECT {0}\tt.name \"Tabel\",{0}\tp.rows \"Ridasid\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine);
+				return String.Format("SELECT {0}\tt.name \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine);
 			}
 
 			public static string FindColumns()
 			{
-				return String.Format("SELECT {0}\ttables.name TableName, {0}\tcolumns.name ColumnName, {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')'{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE @SearchString {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine);
+				return String.Format("SELECT {0}\ttables.name \"Table\", {0}\tcolumns.name \"Column\", {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')' \"Column definition\"{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE @SearchString {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine);
 			}
 		}
 

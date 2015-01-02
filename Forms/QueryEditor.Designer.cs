@@ -88,14 +88,14 @@
 			this.cmnQueryResultsCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mniCreateRowUpdateQuery});
 			this.cmnQueryResultsCommands.Name = "cmnQueryResultsCommands";
-			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(197, 48);
+			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(189, 48);
 			// 
 			// mniCreateRowUpdateQuery
 			// 
 			this.mniCreateRowUpdateQuery.Image = global::SqlQueryTool.Properties.Resources.table_edit;
 			this.mniCreateRowUpdateQuery.Name = "mniCreateRowUpdateQuery";
-			this.mniCreateRowUpdateQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateRowUpdateQuery.Text = "Koosta UPDATE-päring";
+			this.mniCreateRowUpdateQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateRowUpdateQuery.Text = "Create UPDATE query";
 			this.mniCreateRowUpdateQuery.Click += new System.EventHandler(this.mniCreateRowUpdateQuery_Click);
 			// 
 			// QueryEditor

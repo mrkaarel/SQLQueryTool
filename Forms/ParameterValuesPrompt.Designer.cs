@@ -51,7 +51,7 @@
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 1;
-			this.btnCancel.Text = "Katkesta";
+			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// tblParameterValues
@@ -69,7 +69,7 @@
 			this.tblParameterValues.Name = "tblParameterValues";
 			this.tblParameterValues.RowCount = 1;
 			this.tblParameterValues.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tblParameterValues.Size = new System.Drawing.Size(471, 0);
+			this.tblParameterValues.Size = new System.Drawing.Size(469, 0);
 			this.tblParameterValues.TabIndex = 2;
 			// 
 			// ParameterValuesPrompt
@@ -89,7 +89,7 @@
 			this.Name = "ParameterValuesPrompt";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Sisesta parameetrite väärtused";
+			this.Text = "Insert parameter values";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

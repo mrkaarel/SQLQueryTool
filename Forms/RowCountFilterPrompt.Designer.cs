@@ -38,9 +38,9 @@
 			this.lblMinimumRowCountTitle.AutoSize = true;
 			this.lblMinimumRowCountTitle.Location = new System.Drawing.Point(13, 13);
 			this.lblMinimumRowCountTitle.Name = "lblMinimumRowCountTitle";
-			this.lblMinimumRowCountTitle.Size = new System.Drawing.Size(113, 13);
+			this.lblMinimumRowCountTitle.Size = new System.Drawing.Size(101, 13);
 			this.lblMinimumRowCountTitle.TabIndex = 0;
-			this.lblMinimumRowCountTitle.Text = "Minimaalne ridade arv:";
+			this.lblMinimumRowCountTitle.Text = "Minimum row count:";
 			// 
 			// txtMinimumRowCount
 			// 
@@ -67,7 +67,7 @@
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 9;
-			this.btnCancel.Text = "Katkesta";
+			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// RowCountFilterPrompt
@@ -86,7 +86,7 @@
 			this.Name = "RowCountFilterPrompt";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Sisesta minimaalne ridade arv";
+			this.Text = "Enter minimum row count";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

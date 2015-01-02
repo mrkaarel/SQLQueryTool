@@ -40,7 +40,7 @@ namespace SqlQueryTool.Forms
 				this.DialogResult = DialogResult.OK;
 			}
 			catch (Exception ex) {
-				MessageBox.Show(String.Format("Viga andmebaasiühendusega:\n{0}", ex.Message), "Viga andmebaasiühendusega", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(String.Format("Problem connecting to database:\n{0}", ex.Message), "Connection error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 

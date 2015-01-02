@@ -38,13 +38,13 @@
 			this.lblTabText.AutoSize = true;
 			this.lblTabText.Location = new System.Drawing.Point(13, 13);
 			this.lblTabText.Name = "lblTabText";
-			this.lblTabText.Size = new System.Drawing.Size(67, 13);
+			this.lblTabText.Size = new System.Drawing.Size(57, 13);
 			this.lblTabText.TabIndex = 0;
-			this.lblTabText.Text = "Päringu nimi:";
+			this.lblTabText.Text = "Query title:";
 			// 
 			// txtTabText
 			// 
-			this.txtTabText.Location = new System.Drawing.Point(86, 10);
+			this.txtTabText.Location = new System.Drawing.Point(76, 10);
 			this.txtTabText.Name = "txtTabText";
 			this.txtTabText.Size = new System.Drawing.Size(179, 20);
 			this.txtTabText.TabIndex = 1;
@@ -52,16 +52,16 @@
 			// btnCancel
 			// 
 			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.btnCancel.Location = new System.Drawing.Point(190, 51);
+			this.btnCancel.Location = new System.Drawing.Point(180, 51);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 2;
-			this.btnCancel.Text = "Katkesta";
+			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// btnOK
 			// 
-			this.btnOK.Location = new System.Drawing.Point(109, 51);
+			this.btnOK.Location = new System.Drawing.Point(99, 51);
 			this.btnOK.Name = "btnOK";
 			this.btnOK.Size = new System.Drawing.Size(75, 23);
 			this.btnOK.TabIndex = 3;
@@ -75,7 +75,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
-			this.ClientSize = new System.Drawing.Size(277, 86);
+			this.ClientSize = new System.Drawing.Size(268, 86);
 			this.ControlBox = false;
 			this.Controls.Add(this.btnOK);
 			this.Controls.Add(this.btnCancel);
@@ -84,7 +84,7 @@
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
 			this.Name = "TabRenamePrompt";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Nimeta päring ümber";
+			this.Text = "Rename query page";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

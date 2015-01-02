@@ -49,11 +49,11 @@
 			// 
 			this.btnDeleteSelectedConnection.Image = global::SqlQueryTool.Properties.Resources.database_delete;
 			this.btnDeleteSelectedConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.btnDeleteSelectedConnection.Location = new System.Drawing.Point(66, 30);
+			this.btnDeleteSelectedConnection.Location = new System.Drawing.Point(70, 30);
 			this.btnDeleteSelectedConnection.Name = "btnDeleteSelectedConnection";
-			this.btnDeleteSelectedConnection.Size = new System.Drawing.Size(69, 25);
+			this.btnDeleteSelectedConnection.Size = new System.Drawing.Size(65, 25);
 			this.btnDeleteSelectedConnection.TabIndex = 2;
-			this.btnDeleteSelectedConnection.Text = "Kustuta";
+			this.btnDeleteSelectedConnection.Text = "Delete";
 			this.btnDeleteSelectedConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnDeleteSelectedConnection.UseVisualStyleBackColor = true;
 			this.btnDeleteSelectedConnection.Click += new System.EventHandler(this.btnDeleteSelectedConnection_Click);
@@ -67,7 +67,7 @@
 			this.btnConnect.Name = "btnConnect";
 			this.btnConnect.Size = new System.Drawing.Size(71, 25);
 			this.btnConnect.TabIndex = 3;
-			this.btnConnect.Text = "Ühenda";
+			this.btnConnect.Text = "Connect";
 			this.btnConnect.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnConnect.UseVisualStyleBackColor = true;
 			this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
@@ -78,9 +78,9 @@
 			this.btnAddConnection.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.btnAddConnection.Location = new System.Drawing.Point(3, 30);
 			this.btnAddConnection.Name = "btnAddConnection";
-			this.btnAddConnection.Size = new System.Drawing.Size(57, 25);
+			this.btnAddConnection.Size = new System.Drawing.Size(61, 25);
 			this.btnAddConnection.TabIndex = 1;
-			this.btnAddConnection.Text = "Uus…";
+			this.btnAddConnection.Text = "New…";
 			this.btnAddConnection.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.btnAddConnection.UseVisualStyleBackColor = true;
 			this.btnAddConnection.Click += new System.EventHandler(this.btnAddConnection_Click);

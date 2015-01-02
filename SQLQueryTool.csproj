@@ -124,28 +124,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Utils\WinFormsHelper.cs" />
-    <EmbeddedResource Include="Forms\ConnectionManager.resx">
-      <DependentUpon>ConnectionManager.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DatabaseObjectBrowser.resx">
-      <DependentUpon>DatabaseObjectBrowser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ParameterValuesPrompt.resx">
-      <DependentUpon>ParameterValuesPrompt.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\QueryEditor.resx">
-      <DependentUpon>QueryEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\RowCountFilterPrompt.resx">
-      <DependentUpon>RowCountFilterPrompt.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ConnectionSettings.resx">
       <DependentUpon>ConnectionSettings.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\TabRenamePrompt.resx">
-      <DependentUpon>TabRenamePrompt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -162,15 +142,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Forms\SQLQueryTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -211,8 +182,6 @@
     <None Include="External libraries\SciLexer.dll" />
     <Content Include="External libraries\ScintillaNet.dll" />
     <Content Include="Resources\QueryTool.ico" />
-    <None Include="Resources\arrow_left.png" />
-    <None Include="Resources\arrow_right.png" />
     <Content Include="Resources\find.png" />
     <Content Include="Resources\key.png" />
     <Content Include="Resources\script.png" />

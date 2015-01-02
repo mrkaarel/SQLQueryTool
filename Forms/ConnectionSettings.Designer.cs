@@ -61,9 +61,9 @@
 			this.lblDatabaseTitle.AutoSize = true;
 			this.lblDatabaseTitle.Location = new System.Drawing.Point(13, 39);
 			this.lblDatabaseTitle.Name = "lblDatabaseTitle";
-			this.lblDatabaseTitle.Size = new System.Drawing.Size(66, 13);
+			this.lblDatabaseTitle.Size = new System.Drawing.Size(56, 13);
 			this.lblDatabaseTitle.TabIndex = 2;
-			this.lblDatabaseTitle.Text = "Andmebaas:";
+			this.lblDatabaseTitle.Text = "Database:";
 			// 
 			// txtUsername
 			// 
@@ -85,9 +85,9 @@
 			this.chkIntegratedSecurity.AutoSize = true;
 			this.chkIntegratedSecurity.Location = new System.Drawing.Point(93, 114);
 			this.chkIntegratedSecurity.Name = "chkIntegratedSecurity";
-			this.chkIntegratedSecurity.Size = new System.Drawing.Size(132, 17);
+			this.chkIntegratedSecurity.Size = new System.Drawing.Size(134, 17);
 			this.chkIntegratedSecurity.TabIndex = 6;
-			this.chkIntegratedSecurity.Text = "Integreeritud turvalisus";
+			this.chkIntegratedSecurity.Text = "Use integrated security";
 			this.chkIntegratedSecurity.UseVisualStyleBackColor = true;
 			this.chkIntegratedSecurity.CheckedChanged += new System.EventHandler(this.chkIntegratedSecurity_CheckedChanged);
 			// 
@@ -96,18 +96,18 @@
 			this.lblUsernameTitle.AutoSize = true;
 			this.lblUsernameTitle.Location = new System.Drawing.Point(13, 65);
 			this.lblUsernameTitle.Name = "lblUsernameTitle";
-			this.lblUsernameTitle.Size = new System.Drawing.Size(69, 13);
+			this.lblUsernameTitle.Size = new System.Drawing.Size(58, 13);
 			this.lblUsernameTitle.TabIndex = 7;
-			this.lblUsernameTitle.Text = "Kasutajanimi:";
+			this.lblUsernameTitle.Text = "Username:";
 			// 
 			// lblPasswordTitle
 			// 
 			this.lblPasswordTitle.AutoSize = true;
 			this.lblPasswordTitle.Location = new System.Drawing.Point(13, 91);
 			this.lblPasswordTitle.Name = "lblPasswordTitle";
-			this.lblPasswordTitle.Size = new System.Drawing.Size(40, 13);
+			this.lblPasswordTitle.Size = new System.Drawing.Size(56, 13);
 			this.lblPasswordTitle.TabIndex = 8;
-			this.lblPasswordTitle.Text = "Parool:";
+			this.lblPasswordTitle.Text = "Password:";
 			// 
 			// btnCancel
 			// 
@@ -116,7 +116,7 @@
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
 			this.btnCancel.TabIndex = 9;
-			this.btnCancel.Text = "Katkesta";
+			this.btnCancel.Text = "Cancel";
 			this.btnCancel.UseVisualStyleBackColor = true;
 			// 
 			// btnOk
@@ -161,7 +161,7 @@
 			this.Name = "ConnectionSettings";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-			this.Text = "Uus ühendus";
+			this.Text = "New Connection";
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

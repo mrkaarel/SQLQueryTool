@@ -20,6 +20,7 @@ namespace SqlQueryTool.Forms
 		public event StatusBarTextChangeHandler OnStatusBarTextChangeRequested;
 
 		private string EMPTY_SEARCHBOX_TEXT;
+		private string EMPTY_TABLE_FIELDS_TITLE;
 		private int Settings_MinimumRowCount = 0;
 
 		private List<TableInfo> tables;
@@ -33,6 +34,7 @@ namespace SqlQueryTool.Forms
 			InitializeComponent();
 
 			EMPTY_SEARCHBOX_TEXT = txtSearch.Text;
+			EMPTY_TABLE_FIELDS_TITLE = lblTableFieldsTitle.Text;
 		}
 
 		public void SetConnectionData(ConnectionData connectionData)
@@ -71,7 +73,7 @@ namespace SqlQueryTool.Forms
 					}
 				}
 				catch (Exception) {
-					MessageBox.Show("Probleem SP-de laadimisega", "Hoiatus", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					MessageBox.Show("Problem loading stored procs", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				}
 
 				cmd.CommandText = QueryBuilder.SystemQueries.GetViewList();
@@ -95,7 +97,7 @@ namespace SqlQueryTool.Forms
 			trvDatabaseObjects.Nodes.Clear();
 
 			if (tables.Count > 0) {
-				var tablesRootNode = new TreeNode() { Name = "Tables", Text = "Tabelid", ContextMenuStrip = cmnTableCommandsGlobal };
+				var tablesRootNode = new TreeNode() { Name = "Tables", Text = "Tables", ContextMenuStrip = cmnTableCommandsGlobal };
 				foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
 					tablesRootNode.Nodes.Add(new TreeNode() { Name = tableInfo.Name, Text = tableInfo.RowCount < Int32.MaxValue ? String.Format("{0} ({1})", tableInfo.Name, tableInfo.RowCount) : tableInfo.Name, ContextMenuStrip = cmnTableCommands });
 				}
@@ -103,7 +105,7 @@ namespace SqlQueryTool.Forms
 			}
 
 			if (procs.Count > 0) {
-				var procsRootNode = new TreeNode() { Name = "Procs", Text = "Protseduurid" };
+				var procsRootNode = new TreeNode() { Name = "Procs", Text = "Stored procedures" };
 				foreach (var proc in procs.Where(p => p.Name.Contains(filterText) || (chkSearchSPContents.Checked && p.Content.ToLower().Contains(filterText)))) {
 					procsRootNode.Nodes.Add(new TreeNode() { Name = proc.Name, Text = proc.Name, ContextMenuStrip = cmnStoredProcCommands });
 				}
@@ -111,7 +113,7 @@ namespace SqlQueryTool.Forms
 			}
 
 			if (views.Count > 0) {
-				var viewsRootNode = new TreeNode() { Name = "Views", Text = "Vaated" };
+				var viewsRootNode = new TreeNode() { Name = "Views", Text = "Views" };
 				foreach (var view in views.Where(v => v.Name.Contains(filterText) || (chkSearchSPContents.Checked && v.Definition.ToLower().Contains(filterText)))) {
 					viewsRootNode.Nodes.Add(new TreeNode() { Name = view.Name, Text = view.Name, ContextMenuStrip = cmnViewCommands });
 				}
@@ -131,7 +133,7 @@ namespace SqlQueryTool.Forms
 			dgvTableFields.Rows.Clear();
 			foreach (ColumnDefinition col in table.Columns) {
 				string description = String.Format("{0}{1}{2}",
-					!String.IsNullOrEmpty(col.DefaultValue) ? String.Format("Vaikeväärtus: {0}", col.DefaultValue) : String.Empty,
+					!String.IsNullOrEmpty(col.DefaultValue) ? String.Format("Default: {0}", col.DefaultValue) : String.Empty,
 					(String.IsNullOrEmpty(col.DefaultValue) || String.IsNullOrEmpty(col.Description)) ? String.Empty : Environment.NewLine,
 					col.Description
 				);
@@ -148,7 +150,7 @@ namespace SqlQueryTool.Forms
 		private void HideTableFieldsOverview()
 		{
 			dgvTableFields.DataSource = null;
-			lblTableFieldsTitle.Text = "Tabeli väljad:";
+			lblTableFieldsTitle.Text = EMPTY_TABLE_FIELDS_TITLE;
 			lblTableFieldsTitle.Enabled = false;
 			splDatabaseObjects.Panel2Collapsed = true;
 		}
@@ -172,8 +174,8 @@ namespace SqlQueryTool.Forms
 			}
 
 			BuildVisibleDatabaseObjectList(txtSearch.Text);
-			trvDatabaseObjects.Nodes["Tables"].Text = Settings_MinimumRowCount == 0 ? "Tabelid" : String.Format("Tabelid (>= {0} rida)", Settings_MinimumRowCount);
-			OnStatusBarTextChangeRequested(String.Format("Näitan {0} tabelit {1}st", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count));
+			trvDatabaseObjects.Nodes["Tables"].Text = Settings_MinimumRowCount == 0 ? "Tables" : String.Format("Tables (>= {0} rows)", Settings_MinimumRowCount);
+			OnStatusBarTextChangeRequested(String.Format("Showing {0} tables out of {1}", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count));
 		}
 
 		private void AddRowCountsToTableInfos(DbConnection conn)

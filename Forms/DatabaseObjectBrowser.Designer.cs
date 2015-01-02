@@ -28,11 +28,10 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+			System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
 			this.splDatabaseObjects = new System.Windows.Forms.SplitContainer();
 			this.chkSearchSPContents = new System.Windows.Forms.CheckBox();
-			this.btnRefresh = new System.Windows.Forms.Button();
 			this.txtSearch = new System.Windows.Forms.TextBox();
 			this.trvDatabaseObjects = new System.Windows.Forms.TreeView();
 			this.lblTableFieldsTitle = new System.Windows.Forms.Label();
@@ -42,6 +41,10 @@
 			this.colDescription = new System.Windows.Forms.DataGridViewImageColumn();
 			this.searchTimer = new System.Windows.Forms.Timer(this.components);
 			this.cmnTableCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.cmnStoredProcCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.cmnTableCommandsGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.btnRefresh = new System.Windows.Forms.Button();
 			this.mniCreateSelectQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniSelectAllRows = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniSelectRowCount = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,14 +53,11 @@
 			this.mniCreateInsertQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCreateUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniCreateDeleteQuery = new System.Windows.Forms.ToolStripMenuItem();
-			this.cmnStoredProcCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniCopyStoredProcName = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniGrantExecuteOnSP = new System.Windows.Forms.ToolStripMenuItem();
-			this.cmnTableCommandsGlobal = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniBuildTableRowCountsQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniSetTableRowFilter = new System.Windows.Forms.ToolStripMenuItem();
 			this.mniFindColumns = new System.Windows.Forms.ToolStripMenuItem();
-			this.cmnViewCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniShowViewDefinition = new System.Windows.Forms.ToolStripMenuItem();
 			this.splDatabaseObjects.Panel1.SuspendLayout();
 			this.splDatabaseObjects.Panel2.SuspendLayout();
@@ -98,22 +98,11 @@
 			this.chkSearchSPContents.AutoSize = true;
 			this.chkSearchSPContents.Location = new System.Drawing.Point(4, 29);
 			this.chkSearchSPContents.Name = "chkSearchSPContents";
-			this.chkSearchSPContents.Size = new System.Drawing.Size(197, 17);
+			this.chkSearchSPContents.Size = new System.Drawing.Size(185, 17);
 			this.chkSearchSPContents.TabIndex = 3;
-			this.chkSearchSPContents.Text = "otsi ka protseduuride/vaadete sisust";
+			this.chkSearchSPContents.Text = "search stored proc/view contents";
 			this.chkSearchSPContents.UseVisualStyleBackColor = true;
 			this.chkSearchSPContents.CheckedChanged += new System.EventHandler(this.chkSearchSPContents_CheckedChanged);
-			// 
-			// btnRefresh
-			// 
-			this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnRefresh.Image = global::SqlQueryTool.Properties.Resources.refresh;
-			this.btnRefresh.Location = new System.Drawing.Point(193, 1);
-			this.btnRefresh.Name = "btnRefresh";
-			this.btnRefresh.Size = new System.Drawing.Size(28, 23);
-			this.btnRefresh.TabIndex = 2;
-			this.btnRefresh.UseVisualStyleBackColor = true;
-			this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
 			// 
 			// txtSearch
 			// 
@@ -125,7 +114,7 @@
 			this.txtSearch.Name = "txtSearch";
 			this.txtSearch.Size = new System.Drawing.Size(183, 20);
 			this.txtSearch.TabIndex = 1;
-			this.txtSearch.Text = "otsi…";
+			this.txtSearch.Text = "search…";
 			this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
 			this.txtSearch.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtSearch_DragDrop);
 			this.txtSearch.DragEnter += new System.Windows.Forms.DragEventHandler(this.txtSearch_DragEnter);
@@ -155,9 +144,9 @@
 			this.lblTableFieldsTitle.Enabled = false;
 			this.lblTableFieldsTitle.Location = new System.Drawing.Point(0, 0);
 			this.lblTableFieldsTitle.Name = "lblTableFieldsTitle";
-			this.lblTableFieldsTitle.Size = new System.Drawing.Size(70, 13);
+			this.lblTableFieldsTitle.Size = new System.Drawing.Size(50, 13);
 			this.lblTableFieldsTitle.TabIndex = 1;
-			this.lblTableFieldsTitle.Text = "Tabeli väljad:";
+			this.lblTableFieldsTitle.Text = "Columns:";
 			// 
 			// dgvTableFields
 			// 
@@ -183,10 +172,10 @@
 			// 
 			// colName
 			// 
-			dataGridViewCellStyle3.NullValue = "null";
-			this.colName.DefaultCellStyle = dataGridViewCellStyle3;
+			dataGridViewCellStyle1.NullValue = "null";
+			this.colName.DefaultCellStyle = dataGridViewCellStyle1;
 			this.colName.FillWeight = 137.8173F;
-			this.colName.HeaderText = "Väli";
+			this.colName.HeaderText = "Name";
 			this.colName.MinimumWidth = 60;
 			this.colName.Name = "colName";
 			this.colName.ReadOnly = true;
@@ -194,15 +183,15 @@
 			// colInfo
 			// 
 			this.colInfo.FillWeight = 137.8173F;
-			this.colInfo.HeaderText = "Info";
+			this.colInfo.HeaderText = "Definition";
 			this.colInfo.MinimumWidth = 60;
 			this.colInfo.Name = "colInfo";
 			this.colInfo.ReadOnly = true;
 			// 
 			// colDescription
 			// 
-			dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-			this.colDescription.DefaultCellStyle = dataGridViewCellStyle4;
+			dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+			this.colDescription.DefaultCellStyle = dataGridViewCellStyle2;
 			this.colDescription.FillWeight = 24.36548F;
 			this.colDescription.HeaderText = "";
 			this.colDescription.Name = "colDescription";
@@ -221,7 +210,42 @@
             this.mniCreateUpdateQuery,
             this.mniCreateDeleteQuery});
 			this.cmnTableCommands.Name = "cmnDatabaseObjects";
-			this.cmnTableCommands.Size = new System.Drawing.Size(197, 92);
+			this.cmnTableCommands.Size = new System.Drawing.Size(189, 92);
+			// 
+			// cmnStoredProcCommands
+			// 
+			this.cmnStoredProcCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniCopyStoredProcName,
+            this.mniGrantExecuteOnSP});
+			this.cmnStoredProcCommands.Name = "cmnStoredProcCommands";
+			this.cmnStoredProcCommands.Size = new System.Drawing.Size(230, 48);
+			// 
+			// cmnTableCommandsGlobal
+			// 
+			this.cmnTableCommandsGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniBuildTableRowCountsQuery,
+            this.mniSetTableRowFilter,
+            this.mniFindColumns});
+			this.cmnTableCommandsGlobal.Name = "cmnTableCommandsGlobal";
+			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(233, 70);
+			// 
+			// cmnViewCommands
+			// 
+			this.cmnViewCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mniShowViewDefinition});
+			this.cmnViewCommands.Name = "cmnViewCommands";
+			this.cmnViewCommands.Size = new System.Drawing.Size(185, 48);
+			// 
+			// btnRefresh
+			// 
+			this.btnRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnRefresh.Image = global::SqlQueryTool.Properties.Resources.refresh;
+			this.btnRefresh.Location = new System.Drawing.Point(193, 1);
+			this.btnRefresh.Name = "btnRefresh";
+			this.btnRefresh.Size = new System.Drawing.Size(28, 23);
+			this.btnRefresh.TabIndex = 2;
+			this.btnRefresh.UseVisualStyleBackColor = true;
+			this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
 			// 
 			// mniCreateSelectQuery
 			// 
@@ -232,135 +256,111 @@
             this.mniSelectBottomRows});
 			this.mniCreateSelectQuery.Image = global::SqlQueryTool.Properties.Resources.table;
 			this.mniCreateSelectQuery.Name = "mniCreateSelectQuery";
-			this.mniCreateSelectQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateSelectQuery.Text = "Koosta SELECT-päring";
+			this.mniCreateSelectQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateSelectQuery.Text = "Create SELECT query";
 			// 
 			// mniSelectAllRows
 			// 
 			this.mniSelectAllRows.Image = global::SqlQueryTool.Properties.Resources.table;
 			this.mniSelectAllRows.Name = "mniSelectAllRows";
-			this.mniSelectAllRows.Size = new System.Drawing.Size(167, 22);
-			this.mniSelectAllRows.Text = "Kõik read";
+			this.mniSelectAllRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectAllRows.Text = "All rows";
 			this.mniSelectAllRows.Click += new System.EventHandler(this.mniSelectAllRows_Click);
 			// 
 			// mniSelectRowCount
 			// 
 			this.mniSelectRowCount.Image = global::SqlQueryTool.Properties.Resources.table_count;
 			this.mniSelectRowCount.Name = "mniSelectRowCount";
-			this.mniSelectRowCount.Size = new System.Drawing.Size(167, 22);
-			this.mniSelectRowCount.Text = "Ridade arv";
+			this.mniSelectRowCount.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectRowCount.Text = "Row count";
 			this.mniSelectRowCount.Click += new System.EventHandler(this.mniSelectRowCount_Click);
 			// 
 			// mniSelectTopRows
 			// 
 			this.mniSelectTopRows.Image = global::SqlQueryTool.Properties.Resources.table_top;
 			this.mniSelectTopRows.Name = "mniSelectTopRows";
-			this.mniSelectTopRows.Size = new System.Drawing.Size(167, 22);
-			this.mniSelectTopRows.Text = "Esimesed 100 rida";
+			this.mniSelectTopRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectTopRows.Text = "First 100 rows";
 			this.mniSelectTopRows.Click += new System.EventHandler(this.mniSelectTopRows_Click);
 			// 
 			// mniSelectBottomRows
 			// 
 			this.mniSelectBottomRows.Image = global::SqlQueryTool.Properties.Resources.table_bottom;
 			this.mniSelectBottomRows.Name = "mniSelectBottomRows";
-			this.mniSelectBottomRows.Size = new System.Drawing.Size(167, 22);
-			this.mniSelectBottomRows.Text = "Viimased 100 rida";
+			this.mniSelectBottomRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectBottomRows.Text = "Last 100 rows";
 			this.mniSelectBottomRows.Click += new System.EventHandler(this.mniSelectBottomRows_Click);
 			// 
 			// mniCreateInsertQuery
 			// 
 			this.mniCreateInsertQuery.Image = global::SqlQueryTool.Properties.Resources.table_row_insert;
 			this.mniCreateInsertQuery.Name = "mniCreateInsertQuery";
-			this.mniCreateInsertQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateInsertQuery.Text = "Koosta INSERT-päring";
+			this.mniCreateInsertQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateInsertQuery.Text = "Create INSERT query";
 			this.mniCreateInsertQuery.Click += new System.EventHandler(this.mniCreateInsertQuery_Click);
 			// 
 			// mniCreateUpdateQuery
 			// 
 			this.mniCreateUpdateQuery.Image = global::SqlQueryTool.Properties.Resources.table_edit;
 			this.mniCreateUpdateQuery.Name = "mniCreateUpdateQuery";
-			this.mniCreateUpdateQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateUpdateQuery.Text = "Koosta UPDATE-päring";
+			this.mniCreateUpdateQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateUpdateQuery.Text = "Create UPDATE query";
 			this.mniCreateUpdateQuery.Click += new System.EventHandler(this.mniCreateUpdateQuery_Click);
 			// 
 			// mniCreateDeleteQuery
 			// 
 			this.mniCreateDeleteQuery.Image = global::SqlQueryTool.Properties.Resources.table_row_delete;
 			this.mniCreateDeleteQuery.Name = "mniCreateDeleteQuery";
-			this.mniCreateDeleteQuery.Size = new System.Drawing.Size(196, 22);
-			this.mniCreateDeleteQuery.Text = "Koosta DELETE-päring";
+			this.mniCreateDeleteQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateDeleteQuery.Text = "Create DELETE query";
 			this.mniCreateDeleteQuery.Click += new System.EventHandler(this.mniCreateDeleteQuery_Click);
-			// 
-			// cmnStoredProcCommands
-			// 
-			this.cmnStoredProcCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniCopyStoredProcName,
-            this.mniGrantExecuteOnSP});
-			this.cmnStoredProcCommands.Name = "cmnStoredProcCommands";
-			this.cmnStoredProcCommands.Size = new System.Drawing.Size(239, 48);
 			// 
 			// mniCopyStoredProcName
 			// 
 			this.mniCopyStoredProcName.Image = global::SqlQueryTool.Properties.Resources.page_copy;
 			this.mniCopyStoredProcName.Name = "mniCopyStoredProcName";
-			this.mniCopyStoredProcName.Size = new System.Drawing.Size(238, 22);
-			this.mniCopyStoredProcName.Text = "Kopeeri nimi";
+			this.mniCopyStoredProcName.Size = new System.Drawing.Size(229, 22);
+			this.mniCopyStoredProcName.Text = "Copy name to clipboard";
 			this.mniCopyStoredProcName.Click += new System.EventHandler(this.mniCopyStoredProcName_Click);
 			// 
 			// mniGrantExecuteOnSP
 			// 
 			this.mniGrantExecuteOnSP.Image = global::SqlQueryTool.Properties.Resources.key_add;
 			this.mniGrantExecuteOnSP.Name = "mniGrantExecuteOnSP";
-			this.mniGrantExecuteOnSP.Size = new System.Drawing.Size(238, 22);
-			this.mniGrantExecuteOnSP.Text = "Anna kasutajale käivitusõigus...";
+			this.mniGrantExecuteOnSP.Size = new System.Drawing.Size(229, 22);
+			this.mniGrantExecuteOnSP.Text = "Grant EXECUTE permissions…";
 			this.mniGrantExecuteOnSP.Click += new System.EventHandler(this.mniGrantExecuteOnSP_Click);
-			// 
-			// cmnTableCommandsGlobal
-			// 
-			this.cmnTableCommandsGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniBuildTableRowCountsQuery,
-            this.mniSetTableRowFilter,
-            this.mniFindColumns});
-			this.cmnTableCommandsGlobal.Name = "cmnTableCommandsGlobal";
-			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(232, 70);
 			// 
 			// mniBuildTableRowCountsQuery
 			// 
 			this.mniBuildTableRowCountsQuery.Image = global::SqlQueryTool.Properties.Resources.table_count;
 			this.mniBuildTableRowCountsQuery.Name = "mniBuildTableRowCountsQuery";
-			this.mniBuildTableRowCountsQuery.Size = new System.Drawing.Size(231, 22);
-			this.mniBuildTableRowCountsQuery.Text = "Kõigi tabelite ridade arvud";
+			this.mniBuildTableRowCountsQuery.Size = new System.Drawing.Size(232, 22);
+			this.mniBuildTableRowCountsQuery.Text = "Create table row counts query";
 			this.mniBuildTableRowCountsQuery.Click += new System.EventHandler(this.mniBuildTableRowCountsQuery_Click);
 			// 
 			// mniSetTableRowFilter
 			// 
 			this.mniSetTableRowFilter.Image = global::SqlQueryTool.Properties.Resources.table_lightning;
 			this.mniSetTableRowFilter.Name = "mniSetTableRowFilter";
-			this.mniSetTableRowFilter.Size = new System.Drawing.Size(231, 22);
-			this.mniSetTableRowFilter.Text = "Näita tabeleid ridade arvuga…";
+			this.mniSetTableRowFilter.Size = new System.Drawing.Size(232, 22);
+			this.mniSetTableRowFilter.Text = "Filter tables by row count…";
 			this.mniSetTableRowFilter.Click += new System.EventHandler(this.mniSetTableRowFilter_Click);
 			// 
 			// mniFindColumns
 			// 
 			this.mniFindColumns.Image = global::SqlQueryTool.Properties.Resources.find;
 			this.mniFindColumns.Name = "mniFindColumns";
-			this.mniFindColumns.Size = new System.Drawing.Size(231, 22);
-			this.mniFindColumns.Text = "Otsi tulpasid…";
+			this.mniFindColumns.Size = new System.Drawing.Size(232, 22);
+			this.mniFindColumns.Text = "Find columns…";
 			this.mniFindColumns.Click += new System.EventHandler(this.mniFindColumns_Click);
-			// 
-			// cmnViewCommands
-			// 
-			this.cmnViewCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniShowViewDefinition});
-			this.cmnViewCommands.Name = "cmnViewCommands";
-			this.cmnViewCommands.Size = new System.Drawing.Size(203, 26);
 			// 
 			// mniShowViewDefinition
 			// 
 			this.mniShowViewDefinition.Image = global::SqlQueryTool.Properties.Resources.script_code;
 			this.mniShowViewDefinition.Name = "mniShowViewDefinition";
-			this.mniShowViewDefinition.Size = new System.Drawing.Size(202, 22);
-			this.mniShowViewDefinition.Text = "Näita vaate definitsiooni";
+			this.mniShowViewDefinition.Size = new System.Drawing.Size(184, 22);
+			this.mniShowViewDefinition.Text = "Show view definition";
 			this.mniShowViewDefinition.Click += new System.EventHandler(this.mniShowViewDefinition_Click);
 			// 
 			// DatabaseObjectBrowser

@@ -39,11 +39,11 @@ namespace SqlQueryTool.Forms
 				grpDatabaseObjects.Enabled = true;
 				splMainContent.Panel2.Enabled = true;
 
-				lblStatusbarInfo.Text = String.Format("Ühendatud {0}@{1}", connectionData.DatabaseName, connectionData.ServerName);
+				lblStatusbarInfo.Text = String.Format("Connected to {0}@{1}", connectionData.DatabaseName, connectionData.ServerName);
 				this.Text = String.Format("{0} - SQL Query Tool", connectionData);
 			}
 			catch (Exception ex) {
-				MessageBox.Show(String.Format("Viga andmebaasiühendusega:\n{0}", ex.Message), "Viga andmebaasiühendusega", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(String.Format("Problem connecting to database:\n{0}", ex.Message), "Connection error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace SqlQueryTool.Forms
 			var queryEditor = new QueryEditor(queryText) { Name = "queryEditor", Dock = DockStyle.Fill };
 			queryEditor.OnRowUpdate += queryEditor_OnRowUpdate;
 
-			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Päring {0}", tabQueries.TabPages.Count + 1) : tabName;
+			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Query {0}", tabQueries.TabPages.Count + 1) : tabName;
 			var tpQueryPage = new TabPage(tabName) { ImageIndex = 0 };
 
 			tpQueryPage.Controls.Add(queryEditor);
@@ -87,17 +87,17 @@ namespace SqlQueryTool.Forms
 
 						stopWatch.Stop();
 						decimal resultTime = Decimal.Round(stopWatch.ElapsedMilliseconds / 1000m, 1);
-						lblStatusbarInfo.Text = String.Format("{0} kirjet ({1} sekundit; {2}, {3:HH:mm:ss})", results.Rows.Count, resultTime, currentPage.Text, DateTime.Now);
+						lblStatusbarInfo.Text = String.Format("{0} rows ({1} seconds; {2}, {3:HH:mm:ss})", results.Rows.Count, resultTime, currentPage.Text, DateTime.Now);
 
 						queryEditor.ShowResults(new BindingSource() { DataSource = results });
 					}
 					else {
 						int rowsAffected = cmd.ExecuteNonQuery();
 						if (rowsAffected >= 0) {
-							lblStatusbarInfo.Text = String.Format("{0} kirje{1} muudetud ({2}, {3:HH:mm:ss})", rowsAffected, rowsAffected == 1 ? "" : "t", currentPage.Text, DateTime.Now);
+							lblStatusbarInfo.Text = String.Format("{0} row{1} modified ({2}, {3:HH:mm:ss})", rowsAffected, rowsAffected == 1 ? "" : "s", currentPage.Text, DateTime.Now);
 						}
 						else {
-							lblStatusbarInfo.Text = String.Format("Käskluse täitmine õnnestus ({0}, {1:HH:mm:ss})", currentPage.Text, DateTime.Now);
+							lblStatusbarInfo.Text = String.Format("Command executed ({0}, {1:HH:mm:ss})", currentPage.Text, DateTime.Now);
 						}
 					}
 				}
@@ -108,7 +108,7 @@ namespace SqlQueryTool.Forms
 			}
 			catch (Exception ex) {
 				lblStatusbarInfo.Text = "";
-				MessageBox.Show(ex.Message, "Viga", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace SqlQueryTool.Forms
 		{
 			queryText = queryText.ToUpper();
 			if (QueryBuilder.IsDestroyQuery(queryText) && !queryText.Contains("WHERE")) {
-				return (MessageBox.Show("UPDATE/DELETE päring ei sisalda WHERE-klauslit, kas soovid jätkata?", "Tähelepanu", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK);
+				return (MessageBox.Show("UPDATE/DELETE query without a WHERE clause, do you wish to proceed?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK);
 			}
 			else {
 				return true;
@@ -210,7 +210,7 @@ namespace SqlQueryTool.Forms
 			if (e.Button == MouseButtons.Right) {
 				for (int i = 0; i < tabQueries.TabCount; i++) {
 					if (tabQueries.GetTabRect(i).Contains(e.Location)) {
-						mniCloseTabpage.Text = String.Format("Sulge {0}", tabQueries.TabPages[i].Text);
+						mniCloseTabpage.Text = String.Format("Close {0}", tabQueries.TabPages[i].Text);
 
 						tabQueries.Tag = tabQueries.TabPages[i];
 						cmnTabpage.Show(tabQueries, e.Location);
