@@ -24,6 +24,9 @@ namespace SqlQueryTool.Forms
 			connectionManager.OnConnectionInitiated += connectionManager_OnConnectionInitiated;
 			databaseObjectBrowser.OnNewQueryInitiated += databaseObjectsViewer_OnNewQueryInitiated;
 			databaseObjectBrowser.OnStatusBarTextChangeRequested += databaseObjectsViewer_OnStatusBarTextChangeRequested;
+
+			// Added here because it cannot be added in design view
+			grpQueries.MouseDoubleClick += grpQueries_MouseDoubleClick;
 		}
 
 		private void ConnectToDatabase(ConnectionData connectionData)
@@ -188,6 +191,11 @@ namespace SqlQueryTool.Forms
 			if (tabQueries.SelectedTab != null) {
 				CloseQueryPage(tabQueries.SelectedTab);
 			}
+		}
+
+		private void grpQueries_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			btnAddQuery.PerformClick();
 		}
 
 		private void mniCloseTabpage_Click(object sender, EventArgs e)
