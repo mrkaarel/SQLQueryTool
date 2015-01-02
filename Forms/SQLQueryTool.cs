@@ -226,9 +226,11 @@ namespace SqlQueryTool.Forms
 
 		private void tabQueries_TabCountChanged(object sender, ControlEventArgs e)
 		{
-			bool enableTabControlButtons = tabQueries.TabPages.Count > 0;
-			btnCloseQuery.Enabled = enableTabControlButtons;
-			btnRunQuery.Enabled = enableTabControlButtons;
+			// The ControlRemoved event is fired before TabPage is actually removed
+			// This workaround gives the expected TabPage count
+			bool hasOpenTabs = tabQueries.Controls.OfType<TabPage>().Count() > 0;
+			btnCloseQuery.Enabled = hasOpenTabs;
+			btnRunQuery.Enabled = hasOpenTabs;
 		}
 
 		private void btnRunQuery_Click(object sender, EventArgs e)
