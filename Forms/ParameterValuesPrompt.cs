@@ -21,15 +21,23 @@ namespace SqlQueryTool.Forms
 
 		private void AddFields(IEnumerable<string> parmNames, IEnumerable<CommandParameter> previousParameters)
 		{
+			bool isFirstElement = true;
+
 			foreach (var parmName in parmNames) {
 				var lblName = new Label() { Anchor = AnchorStyles.Right, Text = String.Format("@{0}", parmName), AutoSize = true };
 				var txtValue = new TextBox() { Anchor = (AnchorStyles.Left | AnchorStyles.Right), Tag = parmName, Name = "txtValue" };
 				txtValue.TextChanged += txtValue_TextChanged;
+
 				var selTypes = new ComboBox() { DropDownStyle = ComboBoxStyle.DropDownList, TabStop = false };
 				selTypes.Items.AddRange(CommandParameter.SupportedTypes);
 				tblParameterValues.Controls.Add(lblName);
 				tblParameterValues.Controls.Add(txtValue);
 				tblParameterValues.Controls.Add(selTypes);
+
+				if (isFirstElement) {
+					this.ActiveControl = txtValue;
+					isFirstElement = false;
+				}
 
 				var previous = previousParameters.SingleOrDefault(p => p.Name == parmName);
 				if (previous != null) {
@@ -44,8 +52,6 @@ namespace SqlQueryTool.Forms
 			var selTypes = (tblParameterValues.GetNextControl((sender as TextBox), true)) as ComboBox;
 			selTypes.SelectedItem = CommandParameter.GuessValueType(value);
 		}
-
-
 
 		private void btnOK_Click(object sender, EventArgs e)
 		{
