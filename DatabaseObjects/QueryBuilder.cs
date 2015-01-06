@@ -160,7 +160,7 @@ namespace SqlQueryTool.DatabaseObjects
 				return @"
 					SELECT 
 						o.name, 
-						m.definition 
+						COALESCE(m.definition, '') AS definiton 
 					FROM 
 						sys.objects o 
 					LEFT JOIN 
