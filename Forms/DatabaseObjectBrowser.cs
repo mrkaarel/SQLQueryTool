@@ -368,7 +368,8 @@ namespace SqlQueryTool.Forms
 
 		private void mniShowViewDefinition_Click(object sender, EventArgs e)
 		{
-
+			var view = this.views.Single(v => v.Name == trvDatabaseObjects.SelectedNode.Name);
+			OnNewQueryInitiated(view.Name, view.Definition);
 		}
 
 		private void mniCopyStoredProcName_Click(object sender, EventArgs e)
