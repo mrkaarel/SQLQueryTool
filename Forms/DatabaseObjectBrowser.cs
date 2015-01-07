@@ -39,6 +39,9 @@ namespace SqlQueryTool.Forms
 
 		public void SetConnectionData(ConnectionData connectionData)
 		{
+			if (currentConnectionData != null && currentConnectionData.ToString() != connectionData.ToString()) {
+				Settings_MinimumRowCount = 0;
+			}
 			this.currentConnectionData = connectionData;
 			this.LoadDatabaseObjects(currentConnectionData);
 		}
@@ -51,10 +54,10 @@ namespace SqlQueryTool.Forms
 
 			using (var conn = connectionData.GetOpenConnection()) {
 				var cmd = conn.CreateCommand();
-				cmd.CommandText = QueryBuilder.SystemQueries.GetTableList();
+				cmd.CommandText = QueryBuilder.SystemQueries.GetTableListWithRowCounts();
 				using (var rdr = cmd.ExecuteReader()) {
 					while (rdr.Read()) {
-						tables.Add(new TableInfo() { Name = rdr.GetString(0), RowCount = Int32.MaxValue });
+						tables.Add(new TableInfo() { Name = rdr.GetString(0), RowCount = rdr.GetInt64(1) });
 					}
 				}
 
@@ -97,7 +100,7 @@ namespace SqlQueryTool.Forms
 			trvDatabaseObjects.Nodes.Clear();
 
 			if (tables.Count > 0) {
-				var tablesRootNode = new TreeNode() { Name = "Tables", Text = "Tables", ContextMenuStrip = cmnTableCommandsGlobal };
+				var tablesRootNode = new TreeNode() { Name = "Tables", Text = Settings_MinimumRowCount == 0 ? "Tables" : String.Format("Tables (>= {0} rows)", Settings_MinimumRowCount), ContextMenuStrip = cmnTableCommandsGlobal };
 				foreach (var tableInfo in tables.Where(t => t.Name.Contains(filterText) && t.RowCount >= Settings_MinimumRowCount)) {
 					tablesRootNode.Nodes.Add(new TreeNode() { Name = tableInfo.Name, Text = tableInfo.RowCount < Int32.MaxValue ? String.Format("{0} ({1})", tableInfo.Name, tableInfo.RowCount) : tableInfo.Name, ContextMenuStrip = cmnTableCommands });
 				}
@@ -155,6 +158,18 @@ namespace SqlQueryTool.Forms
 			splDatabaseObjects.Panel2Collapsed = true;
 		}
 
+		private void SetTableRowFilter()
+		{
+			var prompt = new RowCountFilterPrompt(Settings_MinimumRowCount);
+			prompt.RowCount = Settings_MinimumRowCount;
+			if (prompt.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+				Settings_MinimumRowCount = prompt.RowCount;
+			}
+
+			BuildVisibleDatabaseObjectList(txtSearch.Text);
+			OnStatusBarTextChangeRequested(String.Format("Showing {0} tables out of {1}", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count));
+		}
+
 		private void ToggleSearchFieldFilterView()
 		{
 			if (String.IsNullOrEmpty(txtSearch.Text)) {
@@ -162,34 +177,6 @@ namespace SqlQueryTool.Forms
 			}
 			else {
 				txtSearch.BackColor = Color.Gold;
-			}
-		}
-
-		private void AddTableRowFilter()
-		{
-			if (tables.All(t => t.RowCount == Int32.MaxValue)) {
-				using (var conn = currentConnectionData.GetOpenConnection()) {
-					AddRowCountsToTableInfos(conn);
-				}
-			}
-
-			BuildVisibleDatabaseObjectList(txtSearch.Text);
-			trvDatabaseObjects.Nodes["Tables"].Text = Settings_MinimumRowCount == 0 ? "Tables" : String.Format("Tables (>= {0} rows)", Settings_MinimumRowCount);
-			OnStatusBarTextChangeRequested(String.Format("Showing {0} tables out of {1}", trvDatabaseObjects.Nodes["Tables"].GetNodeCount(false), tables.Count));
-		}
-
-		private void AddRowCountsToTableInfos(DbConnection conn)
-		{
-			var cmd = conn.CreateCommand();
-			cmd.CommandText = QueryBuilder.SystemQueries.GetTableRowCounts();
-
-			using (var rdr = cmd.ExecuteReader()) {
-				while (rdr.Read()) {
-					var tableName = rdr.GetString(0).ToLower();
-					var rowCount = rdr.GetInt64(1);
-
-					tables.SingleOrDefault(t => t.Name == tableName).RowCount = rowCount;
-				}
 			}
 		}
 
@@ -306,17 +293,12 @@ namespace SqlQueryTool.Forms
 
 		private void mniBuildTableRowCountsQuery_Click(object sender, EventArgs e)
 		{
-			OnNewQueryInitiated("Table row counts", QueryBuilder.SystemQueries.GetTableRowCounts());
+			OnNewQueryInitiated("Table row counts", QueryBuilder.SystemQueries.GetTableListWithRowCounts());
 		}
 
 		private void mniSetTableRowFilter_Click(object sender, EventArgs e)
 		{
-			var prompt = new RowCountFilterPrompt(Settings_MinimumRowCount);
-			prompt.RowCount = Settings_MinimumRowCount;
-			if (prompt.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-				Settings_MinimumRowCount = prompt.RowCount;
-			}
-			AddTableRowFilter();
+			SetTableRowFilter();
 		}
 
 		private void mniFindColumns_Click(object sender, EventArgs e)
