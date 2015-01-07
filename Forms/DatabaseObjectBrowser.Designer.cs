@@ -223,18 +223,18 @@
 			// cmnTableCommandsGlobal
 			// 
 			this.cmnTableCommandsGlobal.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniBuildTableRowCountsQuery,
             this.mniSetTableRowFilter,
+            this.mniBuildTableRowCountsQuery,
             this.mniFindColumns});
 			this.cmnTableCommandsGlobal.Name = "cmnTableCommandsGlobal";
-			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(233, 70);
+			this.cmnTableCommandsGlobal.Size = new System.Drawing.Size(233, 92);
 			// 
 			// cmnViewCommands
 			// 
 			this.cmnViewCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mniShowViewDefinition});
 			this.cmnViewCommands.Name = "cmnViewCommands";
-			this.cmnViewCommands.Size = new System.Drawing.Size(185, 48);
+			this.cmnViewCommands.Size = new System.Drawing.Size(185, 26);
 			// 
 			// btnRefresh
 			// 
@@ -263,7 +263,7 @@
 			// 
 			this.mniSelectAllRows.Image = global::SqlQueryTool.Properties.Resources.table;
 			this.mniSelectAllRows.Name = "mniSelectAllRows";
-			this.mniSelectAllRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectAllRows.Size = new System.Drawing.Size(145, 22);
 			this.mniSelectAllRows.Text = "All rows";
 			this.mniSelectAllRows.Click += new System.EventHandler(this.mniSelectAllRows_Click);
 			// 
@@ -271,7 +271,7 @@
 			// 
 			this.mniSelectRowCount.Image = global::SqlQueryTool.Properties.Resources.table_count;
 			this.mniSelectRowCount.Name = "mniSelectRowCount";
-			this.mniSelectRowCount.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectRowCount.Size = new System.Drawing.Size(145, 22);
 			this.mniSelectRowCount.Text = "Row count";
 			this.mniSelectRowCount.Click += new System.EventHandler(this.mniSelectRowCount_Click);
 			// 
@@ -279,7 +279,7 @@
 			// 
 			this.mniSelectTopRows.Image = global::SqlQueryTool.Properties.Resources.table_top;
 			this.mniSelectTopRows.Name = "mniSelectTopRows";
-			this.mniSelectTopRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectTopRows.Size = new System.Drawing.Size(145, 22);
 			this.mniSelectTopRows.Text = "First 100 rows";
 			this.mniSelectTopRows.Click += new System.EventHandler(this.mniSelectTopRows_Click);
 			// 
@@ -287,7 +287,7 @@
 			// 
 			this.mniSelectBottomRows.Image = global::SqlQueryTool.Properties.Resources.table_bottom;
 			this.mniSelectBottomRows.Name = "mniSelectBottomRows";
-			this.mniSelectBottomRows.Size = new System.Drawing.Size(152, 22);
+			this.mniSelectBottomRows.Size = new System.Drawing.Size(145, 22);
 			this.mniSelectBottomRows.Text = "Last 100 rows";
 			this.mniSelectBottomRows.Click += new System.EventHandler(this.mniSelectBottomRows_Click);
 			// 
