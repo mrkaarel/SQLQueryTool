@@ -147,7 +147,7 @@ namespace SqlQueryTool.DatabaseObjects
 
 			public static string GetTableListWithRowCounts()
 			{
-				return String.Format("SELECT {0}\tLOWER(t.name) \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.indexes i ON t.object_id = i.object_id{0}INNER JOIN{0}\tsys.partitions p on i.object_id = p.object_id and i.index_id = p.index_id{0}WHERE{0}\tt.is_ms_shipped = 0{0}GROUP BY{0}\tt.name, p.rows{0}ORDER BY{0}\tt.name{0}", Environment.NewLine);
+				return String.Format("SELECT DISTINCT{0}\tLOWER(t.name) \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.partitions p ON (t.object_id = p.object_id AND p.index_id < 2){0}WHERE{0}\tt.is_ms_shipped = 0{0}ORDER BY{0}\tLOWER(t.name)", Environment.NewLine);
 			}
 
 			public static string GetStoredProcList()
