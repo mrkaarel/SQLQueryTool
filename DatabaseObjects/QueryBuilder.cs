@@ -89,6 +89,9 @@ namespace SqlQueryTool.DatabaseObjects
 			queryText.Remove(queryText.Length - 2, 2);
 
 			queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, filterCell.ColumnName, filterCell.SqlFormattedValue);
+			if (!Heuristics.GetIdColumnNames(tableName).Contains(filterCell.ColumnName.ToLower())) {
+				queryText.AppendFormat("{0}\tAND 1 = 0 /* Review the WHERE clause! */", Environment.NewLine);
+			}
 
 			return queryText.ToString();
 		}

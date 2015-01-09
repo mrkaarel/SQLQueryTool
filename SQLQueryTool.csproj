@@ -74,6 +74,7 @@
     <Compile Include="DatabaseObjects\ColumnType.cs" />
     <Compile Include="Connections\ConnectionData.cs" />
     <Compile Include="DatabaseObjects\CommandParameter.cs" />
+    <Compile Include="DatabaseObjects\Heuristics.cs" />
     <Compile Include="DatabaseObjects\QueryBuilder.cs" />
     <Compile Include="DatabaseObjects\SqlCellValue.cs" />
     <Compile Include="Forms\ConnectionManager.cs">
