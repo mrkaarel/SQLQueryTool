@@ -28,7 +28,6 @@ namespace SqlQueryTool.Forms
 
 			// Added here because it cannot be added in design view
 			grpQueries.MouseDoubleClick += grpQueries_MouseDoubleClick;
-			RestoreAutoSavedQueries();
 		}
 
 		private void ConnectToDatabase(ConnectionData connectionData)
@@ -43,6 +42,8 @@ namespace SqlQueryTool.Forms
 
 				lblStatusbarInfo.Text = String.Format("Connected to {0}@{1}", connectionData.DatabaseName, connectionData.ServerName);
 				this.Text = String.Format("{0} - SQL Query Tool", connectionData);
+
+				RestoreAutoSavedQueries(currentConnectionData.ToString());
 			}
 			catch (Exception ex) {
 				MessageBox.Show(String.Format("Problem connecting to database:\n{0}", ex.Message), "Connection error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -159,21 +160,24 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
-		private void SaveOpenQueries()
+		private void SaveOpenQueries(string connectionData)
 		{
-			var queries = new List<QueryItem>();
+			var currentQueries = new List<QueryItem>();
 
 			foreach (TabPage tabPage in tabQueries.TabPages) {
 				string name = tabPage.Text;
 				string contents = (tabPage.Controls["queryEditor"] as QueryEditor).QueryText;
 
-				queries.Add(new QueryItem(name, contents));
+				currentQueries.Add(new QueryItem(name, contents, currentConnectionData.ToString()));
 			}
 
-			ProtectedDataStorage.Write(AUTOSAVED_QUERIES_FILE_NAME, queries);
+			var savedQueries = (ProtectedDataStorage.Read(AUTOSAVED_QUERIES_FILE_NAME) as List<QueryItem>).Where(q => q.Connection != connectionData).ToList();
+			savedQueries.AddRange(currentQueries);
+
+			ProtectedDataStorage.Write(AUTOSAVED_QUERIES_FILE_NAME, savedQueries);
 		}
 
-		private void RestoreAutoSavedQueries()
+		private void RestoreAutoSavedQueries(string connectionData)
 		{
 			var queries = ProtectedDataStorage.Read(AUTOSAVED_QUERIES_FILE_NAME) as List<QueryItem>;
 
@@ -181,9 +185,11 @@ namespace SqlQueryTool.Forms
 				return;
 			}
 
-			foreach (var query in queries) {
+			foreach (var query in queries.Where(q => q.Connection == connectionData)) {
 				AddNewQueryPage(query.Contents, query.Name);
 			}
+
+			ProtectedDataStorage.Write(AUTOSAVED_QUERIES_FILE_NAME, queries.Where(q => q.Connection != connectionData).ToList());
 		}
 
 		#region EventHandlers
@@ -299,7 +305,9 @@ namespace SqlQueryTool.Forms
 
 		private void SQLQueryTool_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			SaveOpenQueries();
+			if (currentConnectionData != null) {
+				SaveOpenQueries(currentConnectionData.ToString());
+			}
 		}
 
 		#endregion
@@ -309,11 +317,13 @@ namespace SqlQueryTool.Forms
 		{
 			public string Name { get; private set; }
 			public string Contents { get; private set; }
+			public string Connection { get; set; }
 
-			public QueryItem(string name, string contents) : this()
+			public QueryItem(string name, string contents, string connection) : this()
 			{
 				Name = name;
 				Contents = contents;
+				Connection = connection;
 			}
 		}
 	}
