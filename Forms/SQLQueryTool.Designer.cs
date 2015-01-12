@@ -244,6 +244,7 @@ namespace SqlQueryTool.Forms
 			this.KeyPreview = true;
 			this.Name = "SQLQueryTool";
 			this.Text = "SQL query tool";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.SQLQueryTool_FormClosed);
 			this.statusStrip.ResumeLayout(false);
 			this.statusStrip.PerformLayout();
 			this.splMainContent.Panel1.ResumeLayout(false);

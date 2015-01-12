@@ -16,6 +16,7 @@ namespace SqlQueryTool.Forms
 	{
 		private ConnectionData currentConnectionData;
 		private IEnumerable<CommandParameter> lastParameterSet = new List<CommandParameter>();
+		private static readonly string AUTOSAVED_QUERIES_FILE_NAME = "AutoSavedQueries";
 
 		public SQLQueryTool()
 		{
@@ -27,6 +28,7 @@ namespace SqlQueryTool.Forms
 
 			// Added here because it cannot be added in design view
 			grpQueries.MouseDoubleClick += grpQueries_MouseDoubleClick;
+			RestoreAutoSavedQueries();
 		}
 
 		private void ConnectToDatabase(ConnectionData connectionData)
@@ -157,6 +159,33 @@ namespace SqlQueryTool.Forms
 			}
 		}
 
+		private void SaveOpenQueries()
+		{
+			var queries = new List<QueryItem>();
+
+			foreach (TabPage tabPage in tabQueries.TabPages) {
+				string name = tabPage.Text;
+				string contents = (tabPage.Controls["queryEditor"] as QueryEditor).QueryText;
+
+				queries.Add(new QueryItem(name, contents));
+			}
+
+			ProtectedDataStorage.Write(AUTOSAVED_QUERIES_FILE_NAME, queries);
+		}
+
+		private void RestoreAutoSavedQueries()
+		{
+			var queries = ProtectedDataStorage.Read(AUTOSAVED_QUERIES_FILE_NAME) as List<QueryItem>;
+
+			if (queries == null) {
+				return;
+			}
+
+			foreach (var query in queries) {
+				AddNewQueryPage(query.Contents, query.Name);
+			}
+		}
+
 		#region EventHandlers
 
 		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -268,6 +297,24 @@ namespace SqlQueryTool.Forms
 			lblStatusbarInfo.Text = newText;
 		}
 
+		private void SQLQueryTool_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			SaveOpenQueries();
+		}
+
 		#endregion
+
+		[Serializable]
+		public struct QueryItem
+		{
+			public string Name { get; private set; }
+			public string Contents { get; private set; }
+
+			public QueryItem(string name, string contents) : this()
+			{
+				Name = name;
+				Contents = contents;
+			}
+		}
 	}
 }
