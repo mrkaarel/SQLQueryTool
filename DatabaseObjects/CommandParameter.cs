@@ -82,7 +82,8 @@ namespace SqlQueryTool.DatabaseObjects
 
 		public static IEnumerable<string> ParseParameterNames(string queryText)
 		{
-			return Regex.Matches(queryText, "@([a-zA-Z0-9_]+)").Cast<Match>().Select(m => m.Groups[1].Value).Distinct();
+			string queryTextCleaned = Regex.Replace(queryText, "'.*?'", "");
+			return Regex.Matches(queryTextCleaned, "@([a-zA-Z0-9_]+)").Cast<Match>().Select(m => m.Groups[1].Value).Distinct();
 		}
 	}
 }
