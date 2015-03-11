@@ -14,6 +14,9 @@ namespace SqlQueryTool.Forms
 		public delegate void RowUpdateHandler(IEnumerable<SqlCellValue> updateCells, SqlCellValue filterCell);
 		public event RowUpdateHandler OnRowUpdate;
 
+		public delegate void RowDeleteHandler(IEnumerable<SqlCellValue> filterCells, QueryBuilder.SelectionShape selectionShape);
+		public event RowDeleteHandler OnRowDelete;
+
 		public QueryEditor(string queryText)
 		{
 			InitializeComponent();
@@ -118,6 +121,7 @@ namespace SqlQueryTool.Forms
 				cmnQueryResultsCommands.Tag = dataGrid;
 				cmnQueryResultsCommands.Show(dataGrid, dataGrid.PointToClient(Cursor.Position));
 				mniCreateRowUpdateQuery.Enabled = dataGrid.IsSelectionRow();
+				mniCreateRowDeleteQuery.Enabled = dataGrid.IsSelectionRow() || dataGrid.IsSelectionColumn();
 			}
 		}
 
@@ -132,6 +136,14 @@ namespace SqlQueryTool.Forms
 			var filterCell = dgResults.GetSelectedCells().First().OwningRow.Cells[0].ToSqlCellValue();
 
 			OnRowUpdate(updateCells, filterCell);
+		}
+
+		private void mniCreateRowDeleteQuery_Click(object sender, EventArgs e)
+		{
+			var selectedCells = dgResults.GetSelectedCells();
+			var filterCells = selectedCells.OrderBy(c => c.ColumnIndex).ThenBy(c => c.RowIndex).Select(c => c.ToSqlCellValue());
+
+			OnRowDelete(filterCells, dgResults.IsSelectionColumn() ? QueryBuilder.SelectionShape.Column : QueryBuilder.SelectionShape.Row);
 		}
 	}
 }

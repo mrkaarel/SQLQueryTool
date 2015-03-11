@@ -54,6 +54,7 @@ namespace SqlQueryTool.Forms
 		{
 			var queryEditor = new QueryEditor(queryText) { Name = "queryEditor", Dock = DockStyle.Fill };
 			queryEditor.OnRowUpdate += queryEditor_OnRowUpdate;
+			queryEditor.OnRowDelete += queryEditor_OnRowDelete;
 
 			tabName = String.IsNullOrEmpty(tabName) ? String.Format("Query {0}", tabQueries.TabPages.Count + 1) : tabName;
 			var tpQueryPage = new TabPage(tabName) { ImageIndex = 0 };
@@ -286,6 +287,12 @@ namespace SqlQueryTool.Forms
 		{
 			string tableName = tabQueries.SelectedTab.Text;
 			AddNewQueryPage(QueryBuilder.BuildRowUpdateQuery(tableName, updateCells, filterCell), String.Format("{0} (u)", tableName));
+		}
+
+		private void queryEditor_OnRowDelete(IEnumerable<SqlCellValue> filterCells, QueryBuilder.SelectionShape selectionShape)
+		{
+			string tableName = tabQueries.SelectedTab.Text;
+			AddNewQueryPage(QueryBuilder.BuildRowDeleteQuery(tableName, filterCells, selectionShape), String.Format("{0} (d)", tableName));
 		}
 
 		private void connectionManager_OnConnectionInitiated(ConnectionData connectionData)

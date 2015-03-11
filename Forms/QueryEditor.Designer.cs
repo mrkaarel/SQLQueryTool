@@ -33,6 +33,7 @@
 			this.dgResults = new System.Windows.Forms.DataGridView();
 			this.cmnQueryResultsCommands = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mniCreateRowUpdateQuery = new System.Windows.Forms.ToolStripMenuItem();
+			this.mniCreateRowDeleteQuery = new System.Windows.Forms.ToolStripMenuItem();
 			this.splQuery.Panel2.SuspendLayout();
 			this.splQuery.SuspendLayout();
 			this.pnlHelper.SuspendLayout();
@@ -86,9 +87,10 @@
 			// cmnQueryResultsCommands
 			// 
 			this.cmnQueryResultsCommands.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mniCreateRowUpdateQuery});
+            this.mniCreateRowUpdateQuery,
+            this.mniCreateRowDeleteQuery});
 			this.cmnQueryResultsCommands.Name = "cmnQueryResultsCommands";
-			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(189, 48);
+			this.cmnQueryResultsCommands.Size = new System.Drawing.Size(189, 70);
 			// 
 			// mniCreateRowUpdateQuery
 			// 
@@ -97,6 +99,14 @@
 			this.mniCreateRowUpdateQuery.Size = new System.Drawing.Size(188, 22);
 			this.mniCreateRowUpdateQuery.Text = "Create UPDATE query";
 			this.mniCreateRowUpdateQuery.Click += new System.EventHandler(this.mniCreateRowUpdateQuery_Click);
+			// 
+			// mniCreateRowDeleteQuery
+			// 
+			this.mniCreateRowDeleteQuery.Image = global::SqlQueryTool.Properties.Resources.table_row_delete;
+			this.mniCreateRowDeleteQuery.Name = "mniCreateRowDeleteQuery";
+			this.mniCreateRowDeleteQuery.Size = new System.Drawing.Size(188, 22);
+			this.mniCreateRowDeleteQuery.Text = "Create DELETE query";
+			this.mniCreateRowDeleteQuery.Click += new System.EventHandler(this.mniCreateRowDeleteQuery_Click);
 			// 
 			// QueryEditor
 			// 
@@ -121,6 +131,7 @@
 		private System.Windows.Forms.DataGridView dgResults;
 		private System.Windows.Forms.ContextMenuStrip cmnQueryResultsCommands;
 		private System.Windows.Forms.ToolStripMenuItem mniCreateRowUpdateQuery;
+		private System.Windows.Forms.ToolStripMenuItem mniCreateRowDeleteQuery;
 
 	}
 }

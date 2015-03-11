@@ -96,6 +96,23 @@ namespace SqlQueryTool.DatabaseObjects
 			return queryText.ToString();
 		}
 
+		public static string BuildRowDeleteQuery(string tableName, IEnumerable<SqlCellValue> filterCells, SelectionShape filterCellsType)
+		{
+			var queryText = new StringBuilder(String.Format("DELETE FROM{0}\t{1}{0}WHERE{0}\t", Environment.NewLine, tableName));
+
+			if (filterCellsType == SelectionShape.Column) {
+				queryText.AppendFormat("{0} IN ({1})", filterCells.First().ColumnName, String.Join(", ", filterCells.Select(f => f.SqlFormattedValue).ToArray()));
+			}
+			else if (filterCellsType == SelectionShape.Row) {
+				queryText.AppendFormat("({0})", String.Join(" AND ", filterCells.Select(f => String.Format("{0} = {1}", f.ColumnName, f.SqlFormattedValue)).ToArray()));
+			}
+			else {
+				queryText.Append("1 = 0");
+			}
+
+			return queryText.ToString();
+		}
+
 		public static string BuildDeleteQuery(this TableDefinition table)
 		{
 			return String.Format("DELETE FROM {0}\t{1}{0}WHERE{0}\t{2}", Environment.NewLine, table.Name, GetWhereClause(table));
@@ -185,6 +202,12 @@ namespace SqlQueryTool.DatabaseObjects
 			None,
 			LimitTop,
 			LimitBottom,
+		}
+
+		public enum SelectionShape
+		{ 
+			Column,
+			Row
 		}
 	}
 }
