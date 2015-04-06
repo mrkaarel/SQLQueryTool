@@ -60,6 +60,9 @@ namespace SqlQueryTool.Utils
 			if (valueTypeString == "System.Boolean") {
 				value = value == Boolean.TrueString ? "1" : "0";
 			}
+			if (valueTypeString == "System.Decimal") {
+				value = value.Replace(",", ".");
+			}
 			string sqlFormattedValue = String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
 
 			return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue);
