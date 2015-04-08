@@ -172,7 +172,7 @@ namespace SqlQueryTool.Forms
 				currentQueries.Add(new QueryItem(name, contents, currentConnectionData.ToString()));
 			}
 
-			var savedQueries = (ProtectedDataStorage.Read(AUTOSAVED_QUERIES_FILE_NAME) as List<QueryItem>).Where(q => q.Connection != connectionData).ToList();
+			var savedQueries = (ProtectedDataStorage.Read(AUTOSAVED_QUERIES_FILE_NAME) as List<QueryItem> ?? new List<QueryItem>()).Where(q => q.Connection != connectionData).ToList();
 			savedQueries.AddRange(currentQueries);
 
 			ProtectedDataStorage.Write(AUTOSAVED_QUERIES_FILE_NAME, savedQueries);
