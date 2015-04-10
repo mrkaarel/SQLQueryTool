@@ -57,18 +57,27 @@ namespace SqlQueryTool.Forms
 
 		private IEnumerable<string> GetDatabaseNames(string serverName, bool useIntegratedSecurity, string userName, string password)
 		{
-			using (var connection = new SqlConnection(ConnectionData.BuildConnectionString(server: serverName, useIntegratedSecurity: useIntegratedSecurity, userName: userName, password: password))) {
-				connection.Open();
+			var results = new List<string>();
+			try {
+				using (var connection = new SqlConnection(ConnectionData.BuildConnectionString(server: serverName, useIntegratedSecurity: useIntegratedSecurity, userName: userName, password: password))) {
+					connection.Open();
 
-				var cmd = connection.CreateCommand();
-				cmd.CommandText = QueryBuilder.SystemQueries.GetDatabaseList();
+					var cmd = connection.CreateCommand();
+					cmd.CommandText = QueryBuilder.SystemQueries.GetDatabaseList();
 
-				using (var rdr = cmd.ExecuteReader()) {
-					while (rdr.Read()) {
-						yield return rdr.GetString(0);
+
+					using (var rdr = cmd.ExecuteReader()) {
+						while (rdr.Read()) {
+							results.Add(rdr.GetString(0));
+						}
 					}
 				}
 			}
+			catch (Exception ex) {
+				MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			}
+
+			return results;
 		}
 	}
 }
