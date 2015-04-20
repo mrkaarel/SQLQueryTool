@@ -69,6 +69,9 @@ namespace SqlQueryTool.Forms
 			var queryEditor = currentPage.Controls["queryEditor"] as QueryEditor;
 			string queryText = queryEditor.QueryText;
 
+			if (String.IsNullOrEmpty(queryText)) {
+				return;
+			}
 			if (!ConfirmQuery(queryText)) {
 				return;
 			}
