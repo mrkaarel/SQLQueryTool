@@ -19,7 +19,7 @@ namespace SqlQueryTool.DatabaseObjects
 					case "char":
 					case "varchar":
 					case "nchar":
-					case "nvarchar":
+                    case "nvarchar":
 						return true;
 					default:
 						return false;
@@ -58,6 +58,7 @@ namespace SqlQueryTool.DatabaseObjects
 					case "date":
 					case "time":
 					case "image":
+                    case "uniqueidentifier":
 						return true;
 					case "bit":
 					case "tinyint":
@@ -110,6 +111,8 @@ namespace SqlQueryTool.DatabaseObjects
 						return DateTime.Now.ToString("yyyy.MM.dd");
 					case "time":
 						return "00:00:00";
+                    case "uniqueidentifier":
+				        return Guid.Empty.ToString();
 					default:
 						throw new ArgumentException("Unknown DbType: {0}", Name);
 				}
