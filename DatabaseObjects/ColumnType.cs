@@ -44,6 +44,11 @@ namespace SqlQueryTool.DatabaseObjects
             }
         }
 
+        public bool IsReadOnly
+        {
+            get { return Name == "timestamp"; }
+        }
+
         public bool UsesQuotes
         {
             get

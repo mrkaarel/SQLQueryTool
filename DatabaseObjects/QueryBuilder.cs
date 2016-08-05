@@ -11,12 +11,12 @@ namespace SqlQueryTool.DatabaseObjects
         {
             var queryText = new StringBuilder(String.Format("INSERT INTO {0}{1}\t", table.Name.ForQueries(), Environment.NewLine));
 
-            string columnNames = String.Join(", ", table.Columns.Where(c => !c.IsIdentity).Select(c => c.Name.ForQueries()).ToArray());
+            string columnNames = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.Name.ForQueries()).ToArray());
             queryText.AppendFormat("({0})", columnNames);
 
             queryText.AppendFormat("{0}VALUES{0}\t", Environment.NewLine);
 
-            string defaultColumnValues = String.Join(", ", table.Columns.Where(c => !c.IsIdentity).Select(c => c.FormattedValue).ToArray());
+            string defaultColumnValues = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.FormattedValue).ToArray());
             queryText.AppendFormat("({0})", defaultColumnValues);
 
             return queryText.ToString();
@@ -77,7 +77,7 @@ namespace SqlQueryTool.DatabaseObjects
         {
             var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, table.Name.ForQueries()));
 
-            string columns = String.Join(", ", table.Columns.Where(c => !c.IsIdentity).Select(c => String.Format("{0}\t{1} = {2}", Environment.NewLine, c.Name.ForQueries(), c.FormattedValue)).ToArray());
+            string columns = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => String.Format("{0}\t{1} = {2}", Environment.NewLine, c.Name.ForQueries(), c.FormattedValue)).ToArray());
             queryText.Append(columns);
 
             queryText.AppendFormat("{0}WHERE{0}\t{1}", Environment.NewLine, GetWhereClause(table));
