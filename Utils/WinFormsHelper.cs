@@ -3,82 +3,89 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SqlQueryTool.Utils
 {
-	public static class WinFormsHelper
-	{
-		public static void ToggleColumnNamesCopy(this DataGridView dataGridView)
-		{
-			if (dataGridView.IsSelectionColumn()) {
-				dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-			}
-			else {
-				dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
-			}
-		}
+    public static class WinFormsHelper
+    {
+        public static void ToggleColumnNamesCopy(this DataGridView dataGridView)
+        {
+            if (dataGridView.IsSelectionColumn())
+            {
+                dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
+            }
+            else
+            {
+                dataGridView.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableAlwaysIncludeHeaderText;
+            }
+        }
 
-		public static bool IsSelectionColumn(this DataGridView dataGridView)
-		{
-			var selectedCells = dataGridView.GetSelectedCells();
+        public static bool IsSelectionColumn(this DataGridView dataGridView)
+        {
+            var selectedCells = dataGridView.GetSelectedCells();
 
-			if (selectedCells.Count() == 0) {
-				return false;
-			}
+            if (selectedCells.Count() == 0)
+            {
+                return false;
+            }
 
-			int columnIndex = selectedCells.First().ColumnIndex;
+            int columnIndex = selectedCells.First().ColumnIndex;
 
-			return selectedCells.All(c => c.ColumnIndex == columnIndex);
-		}
+            return selectedCells.All(c => c.ColumnIndex == columnIndex);
+        }
 
-		public static bool IsSelectionRow(this DataGridView dataGridView)
-		{
-			var selectedCells = dataGridView.GetSelectedCells();
+        public static bool IsSelectionRow(this DataGridView dataGridView)
+        {
+            var selectedCells = dataGridView.GetSelectedCells();
 
-			if (selectedCells.Count() == 0) {
-				return false;
-			}
+            if (selectedCells.Count() == 0)
+            {
+                return false;
+            }
 
-			int rowIndex = selectedCells.First().RowIndex;
+            int rowIndex = selectedCells.First().RowIndex;
 
-			return selectedCells.All(c => c.RowIndex == rowIndex);
-		}
+            return selectedCells.All(c => c.RowIndex == rowIndex);
+        }
 
-		public static IEnumerable<DataGridViewCell> GetSelectedCells(this DataGridView dataGridView)
-		{
-			return dataGridView.SelectedCells.Cast<DataGridViewCell>();
-		}
+        public static IEnumerable<DataGridViewCell> GetSelectedCells(this DataGridView dataGridView)
+        {
+            return dataGridView.SelectedCells.Cast<DataGridViewCell>();
+        }
 
-		public static SqlCellValue ToSqlCellValue(this DataGridViewCell cell)
-		{
-			string value = cell.FormattedValue.ToString();
-			string valueTypeString = cell.ValueType.ToString();
+        public static SqlCellValue ToSqlCellValue(this DataGridViewCell cell)
+        {
+            string value = cell.FormattedValue.ToString();
+            string valueTypeString = cell.ValueType.ToString();
 
-			bool useQuotes = (valueTypeString == "System.String" || valueTypeString == "System.DateTime" || valueTypeString == "System.Guid");
-			if (valueTypeString == "System.Boolean") {
-				value = value == Boolean.TrueString ? "1" : "0";
-			}
-			if (valueTypeString == "System.Decimal") {
-				value = value.Replace(",", ".");
-			}
-			string sqlFormattedValue = String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
+            bool useQuotes = (valueTypeString == "System.String" || valueTypeString == "System.DateTime" || valueTypeString == "System.Guid");
+            if (valueTypeString == "System.Boolean")
+            {
+                value = value == Boolean.TrueString ? "1" : "0";
+            }
+            if (valueTypeString == "System.Decimal")
+            {
+                value = value.Replace(",", ".");
+            }
 
-			return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue);
-		}
+            value = value.Replace("'", "''");
+            string sqlFormattedValue = String.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
 
-		public static TreeNode GetHoverNode(this TreeView treeView, int x, int y)
-		{
-			var pos = treeView.PointToClient(new Point(x, y));
-			var hit = treeView.HitTest(pos);
+            return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue);
+        }
 
-			return hit.Node;
-		}
+        public static TreeNode GetHoverNode(this TreeView treeView, int x, int y)
+        {
+            var pos = treeView.PointToClient(new Point(x, y));
+            var hit = treeView.HitTest(pos);
 
-		public static void CopyTextToClipboard(string text)
-		{
-			Clipboard.SetText(text);
-		}
-	}
+            return hit.Node;
+        }
+
+        public static void CopyTextToClipboard(string text)
+        {
+            Clipboard.SetText(text);
+        }
+    }
 }
