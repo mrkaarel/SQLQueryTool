@@ -11,21 +11,9 @@ namespace SqlQueryTool.DatabaseObjects
             this.Name = columnTypeName;
         }
 
-        public bool IsStringType
+        public bool IsBinary
         {
-            get
-            {
-                switch (Name)
-                {
-                    case "char":
-                    case "varchar":
-                    case "nchar":
-                    case "nvarchar":
-                        return true;
-                    default:
-                        return false;
-                }
-            }
+            get { return Name == "varbinary"; }
         }
 
         public bool IsUnicode
@@ -80,6 +68,7 @@ namespace SqlQueryTool.DatabaseObjects
                     case "real":
                     case "float":
                     case "bigint":
+                    case "varbinary":
                         return false;
                     default:
                         throw new ArgumentException("Unknown DbType: {0}", Name);
@@ -124,6 +113,8 @@ namespace SqlQueryTool.DatabaseObjects
                         return "00:00:00";
                     case "uniqueidentifier":
                         return Guid.Empty.ToString();
+                    case "varbinary":
+                        return "NULL";
                     default:
                         throw new ArgumentException("Unknown DbType: {0}", Name);
                 }

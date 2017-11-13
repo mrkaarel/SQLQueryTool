@@ -29,7 +29,7 @@ namespace SqlQueryTool.DatabaseObjects
 		public string Length
 		{
 			get {
-				if (this.Type.IsStringType && this.rawLength == "-1") {
+				if (this.rawLength == "-1") {
 					return "MAX";
 				}
 				else if (this.Type.IsUnicode) {

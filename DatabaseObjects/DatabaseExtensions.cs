@@ -16,5 +16,16 @@ namespace SqlQueryTool.DatabaseObjects
 
             return name;
         }
+        
+        public static string ForSelectQueries(this ColumnDefinition columnDefinition)
+        {
+            var name = ForQueries(columnDefinition.Name);
+            if (columnDefinition.Type.IsBinary)
+            {
+                return string.Format("CAST({0} AS VARCHAR(MAX)) {0}", name);
+            }
+
+            return name;
+        }
     }
 }

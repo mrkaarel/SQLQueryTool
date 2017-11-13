@@ -40,9 +40,9 @@ namespace SqlQueryTool.DatabaseObjects
                 queryText.Append("TOP 100 ");
             }
 
-            if (table.Columns.Count() > 0)
+            if (table.Columns.Any())
             {
-                string columns = String.Join(", ", table.Columns.Select(c => String.Format("{0}\t{1}", Environment.NewLine, c.Name.ForQueries())).ToArray());
+                string columns = String.Join(", ", table.Columns.Select(c => String.Format("{0}\t{1}", Environment.NewLine, c.ForSelectQueries())).ToArray());
                 queryText.Append(columns);
             }
             else
