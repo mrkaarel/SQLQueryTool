@@ -2,75 +2,76 @@
 
 namespace SqlQueryTool.Utils
 {
-	public class DraggableTabControl : TabControl
-	{
-		private TabPage predraggedTab;
+    public class DraggableTabControl : TabControl
+    {
+        private TabPage predraggedTab;
 
-		public DraggableTabControl()
-		{
-			this.AllowDrop = true;
-		}
+        public DraggableTabControl()
+        {
+            AllowDrop = true;
+        }
 
-		protected override void OnMouseDown(MouseEventArgs e)
-		{
-			predraggedTab = getPointedTab();
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            predraggedTab = getPointedTab();
 
-			base.OnMouseDown(e);
-		}
+            base.OnMouseDown(e);
+        }
 
-		protected override void OnMouseUp(MouseEventArgs e)
-		{
-			predraggedTab = null;
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            predraggedTab = null;
 
-			base.OnMouseUp(e);
-		}
+            base.OnMouseUp(e);
+        }
 
-		protected override void OnMouseMove(MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Left && predraggedTab != null)
-				this.DoDragDrop(predraggedTab, DragDropEffects.Move);
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && predraggedTab != null)
+                DoDragDrop(predraggedTab, DragDropEffects.Move);
 
-			base.OnMouseMove(e);
-		}
+            base.OnMouseMove(e);
+        }
 
-		protected override void OnDragOver(DragEventArgs drgevent)
-		{
-			TabPage draggedTab = (TabPage)drgevent.Data.GetData(typeof(TabPage));
-			TabPage pointedTab = getPointedTab();
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            var draggedTab = (TabPage) drgevent.Data.GetData(typeof(TabPage));
+            var pointedTab = getPointedTab();
 
-			if (draggedTab == predraggedTab && pointedTab != null) {
-				drgevent.Effect = DragDropEffects.Move;
+            if (draggedTab == predraggedTab && pointedTab != null)
+            {
+                drgevent.Effect = DragDropEffects.Move;
 
-				if (pointedTab != draggedTab)
-					swapTabPages(draggedTab, pointedTab);
-			}
+                if (pointedTab != draggedTab)
+                    swapTabPages(draggedTab, pointedTab);
+            }
 
-			base.OnDragOver(drgevent);
-		}
+            base.OnDragOver(drgevent);
+        }
 
-		private TabPage getPointedTab()
-		{
-			for (int i = 0; i < this.TabPages.Count; i++)
-				if (this.GetTabRect(i).Contains(this.PointToClient(Cursor.Position)))
-					return this.TabPages[i];
+        private TabPage getPointedTab()
+        {
+            for (var i = 0; i < TabPages.Count; i++)
+                if (GetTabRect(i).Contains(PointToClient(Cursor.Position)))
+                    return TabPages[i];
 
-			return null;
-		}
+            return null;
+        }
 
-		private void swapTabPages(TabPage src, TabPage dst)
-		{
-			int srci = this.TabPages.IndexOf(src);
-			int dsti = this.TabPages.IndexOf(dst);
+        private void swapTabPages(TabPage src, TabPage dst)
+        {
+            var srci = TabPages.IndexOf(src);
+            var dsti = TabPages.IndexOf(dst);
 
-			this.TabPages[dsti] = src;
-			this.TabPages[srci] = dst;
+            TabPages[dsti] = src;
+            TabPages[srci] = dst;
 
-			if (this.SelectedIndex == srci)
-				this.SelectedIndex = dsti;
-			else if (this.SelectedIndex == dsti)
-				this.SelectedIndex = srci;
+            if (SelectedIndex == srci)
+                SelectedIndex = dsti;
+            else if (SelectedIndex == dsti)
+                SelectedIndex = srci;
 
-			this.Refresh();
-		}
-	}
+            Refresh();
+        }
+    }
 }

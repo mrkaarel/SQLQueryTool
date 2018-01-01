@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace SqlQueryTool.DatabaseObjects
+﻿namespace SqlQueryTool.DatabaseObjects
 {
-	public class SqlCellValue
-	{
-		public string ColumnName { get; set; }
-		public string Value { get; set; }
-		public string SqlFormattedValue { get; set; }
+    public class SqlCellValue
+    {
+        public SqlCellValue(string columnName, string value, string sqlFormattedValue)
+        {
+            ColumnName = columnName;
+            Value = value;
+            SqlFormattedValue = sqlFormattedValue;
+        }
 
-		public SqlCellValue(string columnName, string value, string sqlFormattedValue)
-		{
-			this.ColumnName = columnName;
-			this.Value = value;
-			this.SqlFormattedValue = sqlFormattedValue;
-		}
-	}
+        public string ColumnName { get; }
+        public string Value { get; }
+        public string SqlFormattedValue { get; }
+    }
 }

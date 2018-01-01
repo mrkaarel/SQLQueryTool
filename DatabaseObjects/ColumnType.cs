@@ -4,17 +4,14 @@ namespace SqlQueryTool.DatabaseObjects
 {
     public class ColumnType
     {
-        public string Name { get; set; }
-
         public ColumnType(string columnTypeName)
         {
-            this.Name = columnTypeName;
+            Name = columnTypeName;
         }
 
-        public bool IsBinary
-        {
-            get { return Name == "varbinary"; }
-        }
+        public string Name { get; }
+
+        public bool IsBinary => Name == "varbinary";
 
         public bool IsUnicode
         {
@@ -32,10 +29,7 @@ namespace SqlQueryTool.DatabaseObjects
             }
         }
 
-        public bool IsReadOnly
-        {
-            get { return Name == "timestamp"; }
-        }
+        public bool IsReadOnly => Name == "timestamp";
 
         public bool UsesQuotes
         {
@@ -89,7 +83,7 @@ namespace SqlQueryTool.DatabaseObjects
                     case "text":
                     case "ntext":
                     case "image":
-                        return String.Empty;
+                        return string.Empty;
                     case "bit":
                     case "tinyint":
                     case "smallint":

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 namespace SqlQueryTool.DatabaseObjects
 {
@@ -9,21 +6,17 @@ namespace SqlQueryTool.DatabaseObjects
     {
         public static string ForQueries(this string name)
         {
-            if (DatabaseConstants.ReservedWords.Contains(name.ToLower()))
-            {
-                return string.Format("\"{0}\"", name);
-            }
+            if (DatabaseConstants.ReservedWords.Contains(name.ToLower())) 
+                return $"\"{name}\"";
 
             return name;
         }
-        
+
         public static string ForSelectQueries(this ColumnDefinition columnDefinition)
         {
             var name = ForQueries(columnDefinition.Name);
-            if (columnDefinition.Type.IsBinary)
-            {
+            if (columnDefinition.Type.IsBinary) 
                 return string.Format("CAST({0} AS VARCHAR(MAX)) {0}", name);
-            }
 
             return name;
         }

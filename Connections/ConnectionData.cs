@@ -1,101 +1,79 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Data.SqlClient;
 using System.Text;
 
 namespace SqlQueryTool.Connections
 {
-	public class ConnectionData
-	{
-		public static int DefaultTimeout;
+    public class ConnectionData
+    {
+        public static int DefaultTimeout;
 
-		public string ServerName { get; set; }
-		public string DatabaseName { get; set; }
-		public string UserName { get; set; }
-		public string Password { get; set; }
-		public bool UseIntegratedSecurity { get; set; }
-		public int Timeout { get; set; }
+        public ConnectionData(string settingString)
+        {
+            var settings = settingString.Split('|');
+            ServerName = settings[0];
+            DatabaseName = settings[1];
+            UserName = settings[2];
+            Password = settings[3];
+            if (settings.Length > 4 && int.Parse(settings[4]) == 1) UseIntegratedSecurity = true;
+            Timeout = DefaultTimeout;
+        }
 
-		public ConnectionData(string settingString)
-		{
-			string[] settings = settingString.Split('|');
-			this.ServerName = settings[0];
-			this.DatabaseName = settings[1];
-			this.UserName = settings[2];
-			this.Password = settings[3];
-			if (settings.Length > 4 && Int32.Parse(settings[4]) == 1) {
-				this.UseIntegratedSecurity = true;
-			}
-			this.Timeout = DefaultTimeout;
-		}
+        public ConnectionData(string serverName, string databaseName, string userName, string password,
+            bool useIntegratedSecurity, int timeout)
+        {
+            ServerName = serverName;
+            DatabaseName = databaseName;
+            UserName = userName;
+            Password = password;
+            UseIntegratedSecurity = useIntegratedSecurity;
+            Timeout = timeout;
+        }
 
-		public ConnectionData(string serverName, string databaseName, string userName, string password, bool useIntegratedSecurity)
-			: this(serverName, databaseName, userName, password, useIntegratedSecurity, DefaultTimeout)
-		{ }
+        public string ServerName { get; }
+        public string DatabaseName { get; }
+        private string UserName { get; }
+        private string Password { get; }
+        private bool UseIntegratedSecurity { get; }
+        public int Timeout { private get; set; }
 
-		public ConnectionData(string serverName, string databaseName, string userName, string password, bool useIntegratedSecurity, int timeout)
-		{
-			this.ServerName = serverName;
-			this.DatabaseName = databaseName;
-			this.UserName = userName;
-			this.Password = password;
-			this.UseIntegratedSecurity = useIntegratedSecurity;
-			this.Timeout = timeout;
-		}
+        public string ProviderName => "System.Data.SqlClient";
 
-		public string ProviderName
-		{
-			get
-			{
-				return "System.Data.SqlClient";
-			}
-		}
+        public string SerializedString => $"{ServerName}|{DatabaseName}|{UserName}|{Password}|{(UseIntegratedSecurity ? 1 : 0)}";
 
-		public DbConnection GetOpenConnection()
-		{
-			string connectionString = BuildConnectionString(this.ServerName, this.DatabaseName, this.UseIntegratedSecurity, this.UserName, this.Password, this.Timeout);
+        public DbConnection GetOpenConnection()
+        {
+            var connectionString = BuildConnectionString(ServerName, DatabaseName, UseIntegratedSecurity, UserName,
+                Password, Timeout);
 
-			var conn = new SqlConnection(connectionString);
-			conn.Open();
+            var conn = new SqlConnection(connectionString);
+            conn.Open();
 
-			return conn;
-		}
+            return conn;
+        }
 
-		public static string BuildConnectionString(string server, string dataBase = "", bool useIntegratedSecurity = true, string userName = "", string password = "", int timeout = -1)
-		{
-			var result = new StringBuilder();
+        public static string BuildConnectionString(string server, string dataBase = "",
+            bool useIntegratedSecurity = true, string userName = "", string password = "", int timeout = -1)
+        {
+            var result = new StringBuilder();
 
-			result.AppendFormat("Server = {0}", server);
+            result.AppendFormat("Server = {0}", server);
 
-			if (!String.IsNullOrEmpty(dataBase)) {
-				result.AppendFormat("; Database = {0}", dataBase);
-			}
+            if (!string.IsNullOrEmpty(dataBase)) result.AppendFormat("; Database = {0}", dataBase);
 
-			if (useIntegratedSecurity) {
-				result.Append("; Integrated Security = True");
-			}
-			else {
-				result.AppendFormat("; User ID = {0}; Password = {1}", userName, password);
-			}
+            if (useIntegratedSecurity)
+                result.Append("; Integrated Security = True");
+            else
+                result.AppendFormat("; User ID = {0}; Password = {1}", userName, password);
 
-			if (timeout > -1) {
-				result.AppendFormat("; Connection Timeout = {0}", timeout);
-			}
+            if (timeout > -1) result.AppendFormat("; Connection Timeout = {0}", timeout);
 
-			return result.ToString();
-		}
+            return result.ToString();
+        }
 
-		public string SerializedString
-		{
-			get
-			{
-				return String.Format("{0}|{1}|{2}|{3}|{4}", this.ServerName, this.DatabaseName, this.UserName, this.Password, UseIntegratedSecurity ? 1 : 0);
-			}
-		}
-
-		public override string ToString()
-		{
-			return String.Format("{0}@{1}", this.DatabaseName, this.ServerName);
-		}
-	}
+        public override string ToString()
+        {
+            return $"{DatabaseName}@{ServerName}";
+        }
+    }
 }

@@ -1,58 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Data;
-
-namespace SqlQueryTool.DatabaseObjects
+﻿namespace SqlQueryTool.DatabaseObjects
 {
-	public class ColumnDefinition
-	{
-		public string Name { get; private set; }
-		public string Description { get; private set; }
-		public ColumnType Type { get; set; }
-		public bool IsIdentity { get; set; }
-		public bool IsNullable { get; set; }
-		public string DefaultValue { get; set; }
+    public class ColumnDefinition
+    {
+        private readonly string rawLength;
 
-		public ColumnDefinition(string name, string description, string dataType, bool isIdentity, string length, bool isNullable, string defaultValue)
-		{
-			this.Name = name;
-			this.Description = description;
-			this.Type = new ColumnType(dataType);
-			this.rawLength = length;
-			this.IsIdentity = isIdentity;
-			this.IsNullable = isNullable;
-			this.DefaultValue = defaultValue;
-		}
+        public ColumnDefinition(string name, string description, string dataType, bool isIdentity, string length,
+            bool isNullable, string defaultValue)
+        {
+            Name = name;
+            Description = description;
+            Type = new ColumnType(dataType);
+            rawLength = length;
+            IsIdentity = isIdentity;
+            IsNullable = isNullable;
+            DefaultValue = defaultValue;
+        }
 
-		private string rawLength;
-		public string Length
-		{
-			get {
-				if (this.rawLength == "-1") {
-					return "MAX";
-				}
-				else if (this.Type.IsUnicode) {
-					return (Int32.Parse(rawLength) / 2).ToString();
-				}
-				else {
-					return rawLength.ToString();
-				}
-			}
-		}
+        public string Name { get; }
+        public string Description { get; }
+        public ColumnType Type { get; set; }
+        public bool IsIdentity { get; set; }
+        public bool IsNullable { get; set; }
+        public string DefaultValue { get; set; }
 
-		public string FormattedValue
-		{
-			get
-			{
-				string result = this.Type.DefaultValue;
+        public string Length
+        {
+            get
+            {
+                if (rawLength == "-1")
+                    return "MAX";
+                if (Type.IsUnicode)
+                    return (int.Parse(rawLength) / 2).ToString();
+                return rawLength;
+            }
+        }
 
-				if (this.Type.UsesQuotes) {
-					result = String.Format("'{0}'", result);
-				}
+        public string FormattedValue
+        {
+            get
+            {
+                var result = Type.DefaultValue;
 
-				return result;
-			}
-		}
-	}
+                if (Type.UsesQuotes) result = $"'{result}'";
+
+                return result;
+            }
+        }
+    }
 }

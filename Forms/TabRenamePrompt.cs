@@ -3,21 +3,21 @@ using System.Windows.Forms;
 
 namespace SqlQueryTool.Forms
 {
-	public partial class TabRenamePrompt : Form
-	{
-		public string TabText { get; set; }
+    public partial class TabRenamePrompt : Form
+    {
+        public TabRenamePrompt(string currentTabText)
+        {
+            InitializeComponent();
 
-		public TabRenamePrompt(string currentTabText)
-		{
-			InitializeComponent();
+            txtTabText.Text = currentTabText;
+        }
 
-			this.txtTabText.Text = currentTabText;
-		}
+        public string TabText { get; set; }
 
-		private void btnOK_Click(object sender, EventArgs e)
-		{
-			this.TabText = txtTabText.Text;
-			this.DialogResult = System.Windows.Forms.DialogResult.OK;
-		}
-	}
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            TabText = txtTabText.Text;
+            DialogResult = DialogResult.OK;
+        }
+    }
 }

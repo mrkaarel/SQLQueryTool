@@ -7,67 +7,75 @@ namespace SqlQueryTool.DatabaseObjects
 {
     public static class QueryBuilder
     {
+        public enum SelectionShape
+        {
+            Column,
+            Row
+        }
+
+        public enum TableSelectLimit
+        {
+            None,
+            LimitTop,
+            LimitBottom
+        }
+
         public static string BuildInsertQuery(this TableDefinition table)
         {
-            var queryText = new StringBuilder(String.Format("INSERT INTO {0}{1}\t", table.Name.ForQueries(), Environment.NewLine));
+            var queryText =
+                new StringBuilder($"INSERT INTO {table.Name.ForQueries()}{Environment.NewLine}\t");
 
-            string columnNames = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.Name.ForQueries()).ToArray());
+            var columnNames = string.Join(", ",
+                table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.Name.ForQueries())
+                    .ToArray());
             queryText.AppendFormat("({0})", columnNames);
 
             queryText.AppendFormat("{0}VALUES{0}\t", Environment.NewLine);
 
-            string defaultColumnValues = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.FormattedValue).ToArray());
+            var defaultColumnValues = string.Join(", ",
+                table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => c.FormattedValue).ToArray());
             queryText.AppendFormat("({0})", defaultColumnValues);
 
             return queryText.ToString();
         }
 
-        public static string BuildSelectRowCountQuery(this TableDefinition table)
-        {
-            return BuildSelectRowCountQuery(table.Name);
-        }
-
         public static string BuildSelectRowCountQuery(string tableName)
         {
-            return String.Format("SELECT{0}\tCOUNT(*){0}FROM{0}\t{1}", Environment.NewLine, tableName.ForQueries());
+            return string.Format("SELECT{0}\tCOUNT(*){0}FROM{0}\t{1}", Environment.NewLine, tableName.ForQueries());
         }
 
-        public static string BuildSelectQuery(this TableDefinition table, TableSelectLimit selectLimit, string whereClause = "")
+        public static string BuildSelectQuery(this TableDefinition table, TableSelectLimit selectLimit,
+            string whereClause = "")
         {
             var queryText = new StringBuilder("SELECT ");
-            if (selectLimit != TableSelectLimit.None)
-            {
-                queryText.Append("TOP 100 ");
-            }
+            if (selectLimit != TableSelectLimit.None) queryText.Append("TOP 100 ");
 
             if (table.Columns.Any())
             {
-                string columns = String.Join(", ", table.Columns.Select(c => String.Format("{0}\t{1}", Environment.NewLine, c.ForSelectQueries())).ToArray());
+                var columns = string.Join(", ",
+                    table.Columns.Select(c => $"{Environment.NewLine}\t{c.ForSelectQueries()}")
+                        .ToArray());
                 queryText.Append(columns);
             }
             else
-            { // for views
+            {
+                // for views
                 queryText.AppendFormat("{0}\t*", Environment.NewLine);
             }
 
             queryText.AppendFormat("{0}FROM{0}\t{1}", Environment.NewLine, table.Name.ForQueries());
 
-            if (!String.IsNullOrEmpty(whereClause))
-            {
+            if (!string.IsNullOrEmpty(whereClause))
                 queryText.AppendFormat("{0}WHERE{0}\t{1}", Environment.NewLine, whereClause);
-            }
 
             if (selectLimit == TableSelectLimit.LimitBottom)
             {
                 queryText.AppendFormat("{0}ORDER BY", Environment.NewLine);
                 if (table.IdentityColumn != null)
-                {
-                    queryText.AppendFormat("{0}\t{1} DESC", Environment.NewLine, table.IdentityColumn.Name.ForQueries());
-                }
+                    queryText.AppendFormat("{0}\t{1} DESC", Environment.NewLine,
+                        table.IdentityColumn.Name.ForQueries());
                 else
-                {
                     queryText.AppendFormat("{0}\t? DESC", Environment.NewLine);
-                }
             }
 
             return queryText.ToString();
@@ -75,9 +83,13 @@ namespace SqlQueryTool.DatabaseObjects
 
         public static string BuildUpdateQuery(this TableDefinition table)
         {
-            var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, table.Name.ForQueries()));
+            var queryText =
+                new StringBuilder(string.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, table.Name.ForQueries()));
 
-            string columns = String.Join(", ", table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c => String.Format("{0}\t{1} = {2}", Environment.NewLine, c.Name.ForQueries(), c.FormattedValue)).ToArray());
+            var columns = string.Join(", ",
+                table.Columns.Where(c => !c.IsIdentity && !c.Type.IsReadOnly).Select(c =>
+                        $"{Environment.NewLine}\t{c.Name.ForQueries()} = {c.FormattedValue}")
+                    .ToArray());
             queryText.Append(columns);
 
             queryText.AppendFormat("{0}WHERE{0}\t{1}", Environment.NewLine, GetWhereClause(table));
@@ -85,73 +97,74 @@ namespace SqlQueryTool.DatabaseObjects
             return queryText.ToString();
         }
 
-        public static string BuildRowUpdateQuery(string tableName, IEnumerable<SqlCellValue> updateCells, SqlCellValue filterCell)
+        public static string BuildRowUpdateQuery(string tableName, IEnumerable<SqlCellValue> updateCells,
+            SqlCellValue filterCell)
         {
-            var queryText = new StringBuilder(String.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, tableName.ForQueries()));
+            var queryText =
+                new StringBuilder(string.Format("UPDATE {0}\t{1}{0}SET", Environment.NewLine, tableName.ForQueries()));
 
             foreach (var cell in updateCells)
-            {
-                queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, cell.ColumnName.ForQueries(), cell.SqlFormattedValue);
-            }
+                queryText.AppendFormat("{0}\t{1} = {2}, ", Environment.NewLine, cell.ColumnName.ForQueries(),
+                    cell.SqlFormattedValue);
             queryText.Remove(queryText.Length - 2, 2);
 
-            queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, filterCell.ColumnName.ForQueries(), filterCell.SqlFormattedValue);
+            queryText.AppendFormat("{0}WHERE{0}\t{1} = {2}", Environment.NewLine, filterCell.ColumnName.ForQueries(),
+                filterCell.SqlFormattedValue);
             if (!Heuristics.GetIdColumnNames(tableName).Contains(filterCell.ColumnName.ToLower()))
-            {
                 queryText.AppendFormat("{0}\tAND 1 = 0 /* Review the WHERE clause! */", Environment.NewLine);
-            }
 
             return queryText.ToString();
         }
 
-        public static string BuildRowDeleteQuery(string tableName, IEnumerable<SqlCellValue> filterCells, SelectionShape filterCellsType)
+        public static string BuildRowDeleteQuery(string tableName, IEnumerable<SqlCellValue> filterCells,
+            SelectionShape filterCellsType)
         {
-            var queryText = new StringBuilder(String.Format("DELETE FROM{0}\t{1}{0}WHERE{0}\t", Environment.NewLine, tableName.ForQueries()));
+            var queryText = new StringBuilder(string.Format("DELETE FROM{0}\t{1}{0}WHERE{0}\t", Environment.NewLine,
+                tableName.ForQueries()));
 
             if (filterCellsType == SelectionShape.Column)
-            {
-                queryText.AppendFormat("{0} IN ({1})", filterCells.First().ColumnName.ForQueries(), String.Join(", ", filterCells.Select(f => f.SqlFormattedValue).ToArray()));
-            }
+                queryText.AppendFormat("{0} IN ({1})", filterCells.First().ColumnName.ForQueries(),
+                    string.Join(", ", filterCells.Select(f => f.SqlFormattedValue).ToArray()));
             else if (filterCellsType == SelectionShape.Row)
-            {
-                queryText.AppendFormat("({0})", String.Join(" AND ", filterCells.Select(f => String.Format("{0} = {1}", f.ColumnName.ForQueries(), f.SqlFormattedValue)).ToArray()));
-            }
+                queryText.AppendFormat("({0})",
+                    string.Join(" AND ",
+                        filterCells.Select(f =>
+                            $"{f.ColumnName.ForQueries()} = {f.SqlFormattedValue}").ToArray()));
             else
-            {
                 queryText.Append("1 = 0");
-            }
 
             return queryText.ToString();
         }
 
         public static string BuildDeleteQuery(this TableDefinition table)
         {
-            return String.Format("DELETE FROM {0}\t{1}{0}WHERE{0}\t{2}", Environment.NewLine, table.Name.ForQueries(), GetWhereClause(table));
+            return string.Format("DELETE FROM {0}\t{1}{0}WHERE{0}\t{2}", Environment.NewLine, table.Name.ForQueries(),
+                GetWhereClause(table));
         }
 
         public static string BuildGrantExecuteOnSP(string spName, string userName = "xxx")
         {
-            return String.Format("GRANT EXECUTE {0}ON {1} {0}TO {2}", Environment.NewLine, spName, userName);
+            return string.Format("GRANT EXECUTE {0}ON {1} {0}TO {2}", Environment.NewLine, spName, userName);
         }
 
         public static bool IsCrudQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new string[] { "INSERT", "SELECT", "UPDATE", "DELETE" });
+            return QueryStartsWithKeyword(queryText, new[] {"INSERT", "SELECT", "UPDATE", "DELETE"});
         }
 
         public static bool IsSelectQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new string[] { "SELECT" });
+            return QueryStartsWithKeyword(queryText, new[] {"SELECT", "EXEC sp_"});
         }
 
         public static bool IsDestroyQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new string[] { "UPDATE", "DELETE" });
+            return QueryStartsWithKeyword(queryText, new[] {"UPDATE", "DELETE"});
         }
 
         public static bool IsStructureAlteringQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new string[] { "ALTER", "DROP" });
+            return QueryStartsWithKeyword(queryText, new[] {"ALTER", "DROP"});
         }
 
         private static bool QueryStartsWithKeyword(string queryText, IEnumerable<string> keywords)
@@ -161,10 +174,7 @@ namespace SqlQueryTool.DatabaseObjects
 
         private static string GetWhereClause(TableDefinition table)
         {
-            if (table.IdentityColumn != null)
-            {
-                return String.Format("{0} = ?", table.IdentityColumn.Name.ForQueries());
-            }
+            if (table.IdentityColumn != null) return $"{table.IdentityColumn.Name.ForQueries()} = ?";
 
             return "?";
         }
@@ -178,12 +188,15 @@ namespace SqlQueryTool.DatabaseObjects
 
             public static string GetTableListWithRowCounts()
             {
-                return String.Format("SELECT DISTINCT{0}\tt.name \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.partitions p ON (t.object_id = p.object_id AND p.index_id < 2){0}WHERE{0}\tt.is_ms_shipped = 0{0}ORDER BY{0}\tt.name", Environment.NewLine);
+                return string.Format(
+                    "SELECT DISTINCT{0}\tt.name \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.partitions p ON (t.object_id = p.object_id AND p.index_id < 2){0}WHERE{0}\tt.is_ms_shipped = 0{0}ORDER BY{0}\tt.name",
+                    Environment.NewLine);
             }
 
             public static string GetStoredProcList()
             {
-                return "SELECT so.name, sc.text FROM sysobjects so JOIN syscomments sc ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 ORDER BY so.name, sc.colid";
+                return
+                    "SELECT so.name, sc.text FROM sysobjects so JOIN syscomments sc ON (sc.id = so.id) WHERE so.type ='P' AND so.category = 0 ORDER BY so.name, sc.colid";
             }
 
             public static string GetViewList()
@@ -204,21 +217,10 @@ namespace SqlQueryTool.DatabaseObjects
 
             public static string FindColumns()
             {
-                return String.Format("SELECT {0}\ttables.name \"Table\", {0}\tcolumns.name \"Column\", {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')' \"Column definition\"{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE @SearchString {0}ORDER BY {0}\ttables.name{0}", Environment.NewLine);
+                return string.Format(
+                    "SELECT {0}\ttables.name \"Table\", {0}\tcolumns.name \"Column\", {0}\tstype.name + ' (' + CAST(columns.length AS VARCHAR) + ')' \"Column definition\"{0}FROM {0}\tsysobjects tables {0}JOIN{0}\tsyscolumns columns ON (tables.id = columns.id) {0}JOIN {0}\tsystypes stype ON (columns.xtype = stype.xusertype){0}WHERE {0}\ttables.xtype = 'U' {0}\tAND tables.name NOT LIKE 'sys%' {0}\tAND columns.name LIKE @SearchString {0}ORDER BY {0}\ttables.name{0}",
+                    Environment.NewLine);
             }
-        }
-
-        public enum TableSelectLimit
-        {
-            None,
-            LimitTop,
-            LimitBottom,
-        }
-
-        public enum SelectionShape
-        {
-            Column,
-            Row
         }
     }
 }
