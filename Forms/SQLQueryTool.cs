@@ -85,7 +85,7 @@ namespace SqlQueryTool.Forms
                     var cmd = BuildCommand(conn, queryText);
                     if (cmd == null) return;
 
-                    if (QueryBuilder.IsSelectQuery(cmd.CommandText))
+                    if (QueryBuilder.IsQueryReturningResults(cmd.CommandText))
                     {
                         var stopWatch = Stopwatch.StartNew();
 

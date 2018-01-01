@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SqlQueryTool.Utils;
 
 namespace SqlQueryTool.DatabaseObjects
 {
@@ -149,27 +150,34 @@ namespace SqlQueryTool.DatabaseObjects
 
         public static bool IsCrudQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new[] {"INSERT", "SELECT", "UPDATE", "DELETE"});
+            return QueryStartsWithKeyword(queryText, "INSERT", "SELECT", "UPDATE", "DELETE");
         }
 
-        public static bool IsSelectQuery(string queryText)
+        public static bool IsQueryReturningResults(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new[] {"SELECT", "EXEC sp_"});
+            return 
+                QueryStartsWithKeyword(queryText, "SELECT")
+                || QueryContainsKeyword(queryText, CustomQueryDirectives.ShowExecutedQueryResults);
         }
 
         public static bool IsDestroyQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new[] {"UPDATE", "DELETE"});
+            return QueryStartsWithKeyword(queryText, "UPDATE", "DELETE");
         }
 
         public static bool IsStructureAlteringQuery(string queryText)
         {
-            return QueryStartsWithKeyword(queryText, new[] {"ALTER", "DROP"});
+            return QueryStartsWithKeyword(queryText, "ALTER", "DROP");
         }
 
-        private static bool QueryStartsWithKeyword(string queryText, IEnumerable<string> keywords)
+        private static bool QueryStartsWithKeyword(string queryText, params string[] keywords)
         {
             return keywords.Any(s => (queryText ?? "").ToUpper().TrimStart().StartsWith(s.ToUpper()));
+        }
+
+        private static bool QueryContainsKeyword(string queryText, params string[] keywords)
+        {
+            return keywords.Any(s => (queryText ?? "").ToUpper().TrimStart().Contains(s.ToUpper()));
         }
 
         private static string GetWhereClause(TableDefinition table)
