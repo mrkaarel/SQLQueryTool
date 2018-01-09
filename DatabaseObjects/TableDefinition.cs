@@ -45,6 +45,12 @@ namespace SqlQueryTool.DatabaseObjects
                         columns.Add(new ColumnDefinition(rdr.GetString(0), rdr.GetString(4), rdr.GetString(1),
                             rdr.GetBoolean(3), rdr.GetString(2), rdr.GetBoolean(5), rdr.GetString(6)));
                 }
+
+                var foreignKeys = ForeignKey.GetForeignKeysFromTable(name, connectionData);
+                foreach (var foreignKey in foreignKeys)
+                {
+                    columns.Single(c => c.Name == foreignKey.ForeignColumn).ForeignKey = foreignKey;
+                }
             }
         }
 

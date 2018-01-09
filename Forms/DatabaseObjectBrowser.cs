@@ -170,12 +170,18 @@ namespace SqlQueryTool.Forms
             dgvTableFields.Rows.Clear();
             foreach (var col in table.Columns)
             {
-                var description =
-                    $"{(!string.IsNullOrEmpty(col.DefaultValue) ? $"Default: {col.DefaultValue}" : string.Empty)}{(string.IsNullOrEmpty(col.DefaultValue) || string.IsNullOrEmpty(col.Description) ? string.Empty : Environment.NewLine)}{col.Description}";
+                var descriptionParts = new string[3];
+                descriptionParts[0] = !string.IsNullOrEmpty(col.DefaultValue) ? $"Default: {col.DefaultValue}" : string.Empty;
+                descriptionParts[1] = col.Description;
+                descriptionParts[2] = col.ForeignKey != null ? $"{col.ForeignKey.PrimaryTable}.{col.ForeignKey.PrimaryColumn}" : string.Empty;
+                var description = string.Join(Environment.NewLine, descriptionParts.Where(s => !string.IsNullOrEmpty(s)).ToArray());
+                
                 dgvTableFields.Rows.Add(col.Name,
                     $"{col.Type.Name} ({col.Length}){(col.IsNullable ? string.Empty : "*")}",
-                    !string.IsNullOrEmpty(description) ? Resources.information :
-                    col.IsIdentity ? Resources.key : new Bitmap(16, 16));
+                    col.IsIdentity ? Resources.key : 
+                        col.ForeignKey != null ? Resources.key_silver :
+                            !string.IsNullOrEmpty(description) ? Resources.information :
+                                new Bitmap(16, 16));
                 dgvTableFields.Rows[dgvTableFields.RowCount - 1].Cells["colDescription"].ToolTipText = description;
             }
 
@@ -321,10 +327,32 @@ namespace SqlQueryTool.Forms
             var node = trvDatabaseObjects.GetHoverNode(e.X, e.Y);
 
             var values = e.Data.GetData(typeof(List<SqlCellValue>)) as List<SqlCellValue>;
+            var targetTable = new TableDefinition(node.Name, currentConnectionData);
+            var specimenValue = values.First();  
+            
             OnNewQueryInitiated(node.Name,
-                new TableDefinition(node.Name, currentConnectionData).BuildSelectQuery(
+                targetTable.BuildSelectQuery(
                     QueryBuilder.TableSelectLimit.None,
-                    $"{values.First().ColumnName} IN ({string.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray())})"));
+                    $"{GetColumnNameForDragDropSelectQuery(specimenValue.TableName, specimenValue.ColumnName, targetTable.Name)} IN ({string.Join(", ", values.Select(v => v.SqlFormattedValue).ToArray())})"));
+        }
+
+        private string GetColumnNameForDragDropSelectQuery(string sourceTable, string sourceColumn, string targetTable)
+        {
+            var foreignKeysToTable = ForeignKey.GetForeignKeysToTable(targetTable, currentConnectionData);
+            var keyMatch = foreignKeysToTable.FirstOrDefault(k => k.ForeignTable == sourceTable && k.ForeignColumn == sourceColumn);
+            if (keyMatch != null)
+            {
+                return keyMatch.PrimaryColumn;
+            }
+            
+            var foreignKeysFromTable = ForeignKey.GetForeignKeysFromTable(targetTable, currentConnectionData);
+            keyMatch = foreignKeysFromTable.FirstOrDefault(k => k.PrimaryTable == sourceTable && k.PrimaryColumn == sourceColumn);
+            if (keyMatch != null)
+            {
+                return keyMatch.ForeignColumn;
+            }
+
+            return sourceColumn;
         }
 
         private void mniBuildTableRowCountsQuery_Click(object sender, EventArgs e)

@@ -101,7 +101,7 @@ namespace SqlQueryTool.Forms
                         lblStatusbarInfo.Text =
                             $"{results.Rows.Count} rows ({resultTime} seconds; {currentPage.Text}, {DateTime.Now:HH:mm:ss})";
 
-                        queryEditor.ShowResults(new BindingSource {DataSource = results});
+                        queryEditor.ShowResults(new BindingSource {DataSource = results}, currentPage.Text);
                     }
                     else
                     {

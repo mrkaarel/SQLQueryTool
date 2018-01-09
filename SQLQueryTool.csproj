@@ -75,6 +75,7 @@
     <Compile Include="Connections\ConnectionData.cs" />
     <Compile Include="DatabaseObjects\CommandParameter.cs" />
     <Compile Include="DatabaseObjects\DatabaseExtensions.cs" />
+    <Compile Include="DatabaseObjects\ForeignKey.cs" />
     <Compile Include="DatabaseObjects\Heuristics.cs" />
     <Compile Include="DatabaseObjects\QueryBuilder.cs" />
     <Compile Include="DatabaseObjects\DatabaseConstants.cs" />
@@ -186,6 +187,7 @@
     <Content Include="Resources\database.ico" />
     <None Include="External libraries\SciLexer.dll" />
     <Content Include="External libraries\ScintillaNet.dll" />
+    <None Include="Resources\key_silver.png" />
     <Content Include="Resources\QueryTool.ico" />
     <Content Include="Resources\find.png" />
     <Content Include="Resources\key.png" />

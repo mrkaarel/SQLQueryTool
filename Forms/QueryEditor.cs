@@ -29,7 +29,7 @@ namespace SqlQueryTool.Forms
         public event RowUpdateHandler OnRowUpdate;
         public event RowDeleteHandler OnRowDelete;
 
-        public void ShowResults(BindingSource bindingSource)
+        public void ShowResults(BindingSource bindingSource, string tableName)
         {
             splQuery.Panel2Collapsed = false;
 
@@ -39,6 +39,7 @@ namespace SqlQueryTool.Forms
             dgResults.DataSource = bindingSource;
             dgResults.AutoResizeColumns();
             dgResults.ResumeLayout();
+            dgResults.Tag = tableName;
         }
 
         private void BuildScintillaEditor(string queryText)

@@ -55,8 +55,7 @@ namespace SqlQueryTool.Utils
 
             value = value.Replace("'", "''");
             var sqlFormattedValue = string.Format("{0}{1}{0}", useQuotes ? "'" : "", value);
-
-            return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue);
+            return new SqlCellValue(cell.OwningColumn.Name, value, sqlFormattedValue, cell.DataGridView.Tag as string);
         }
 
         public static TreeNode GetHoverNode(this TreeView treeView, int x, int y)
