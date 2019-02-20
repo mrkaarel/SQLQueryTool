@@ -9,7 +9,7 @@ namespace SqlQueryTool.DatabaseObjects
     {
         private readonly List<ColumnDefinition> columns;
 
-        public TableDefinition(string name, ConnectionData connectionData)
+        public TableDefinition(string name, long id, ConnectionData connectionData)
         {
             Name = name;
             columns = new List<ColumnDefinition>();
@@ -31,14 +31,14 @@ namespace SqlQueryTool.DatabaseObjects
 
                 if (hasExtendedPropertiesTable)
                     cmd.CommandText =
-                        $@"SELECT scol.name, stype.name, CASE stype.name WHEN 'decimal' THEN CAST(scol.xprec AS VARCHAR)+','+CAST(scol.xscale AS VARCHAR) ELSE CAST(scol.length AS VARCHAR) END, CAST((CASE WHEN scol.status = 128 THEN 1 ELSE 0 END) AS BIT) AS ""IsIdentity"", COALESCE(prop.value, ''), CAST(scol.isnullable AS BIT), COALESCE(syscom.text, '') AS ""DefaultValue"" FROM sysobjects so JOIN syscolumns scol ON (so.id = scol.id) JOIN systypes stype ON (scol.xtype = stype.xusertype) LEFT JOIN sys.extended_properties prop ON (prop.major_id = scol.id AND prop.minor_id = scol.colid AND prop.name = 'MS_Description') LEFT JOIN syscomments syscom ON (scol.cdefault > 0 AND scol.cdefault = syscom.id) WHERE so.name = '{
-                            name
-                        }' AND so.xtype = 'u' AND stype.xusertype != 256 ORDER BY scol.colorder";
+                        $@"SELECT scol.name, stype.name, CASE stype.name WHEN 'decimal' THEN CAST(scol.xprec AS VARCHAR)+','+CAST(scol.xscale AS VARCHAR) ELSE CAST(scol.length AS VARCHAR) END, CAST((CASE WHEN scol.status = 128 THEN 1 ELSE 0 END) AS BIT) AS ""IsIdentity"", COALESCE(prop.value, ''), CAST(scol.isnullable AS BIT), COALESCE(syscom.text, '') AS ""DefaultValue"" FROM sysobjects so JOIN syscolumns scol ON (so.id = scol.id) JOIN systypes stype ON (scol.xtype = stype.xusertype) LEFT JOIN sys.extended_properties prop ON (prop.major_id = scol.id AND prop.minor_id = scol.colid AND prop.name = 'MS_Description') LEFT JOIN syscomments syscom ON (scol.cdefault > 0 AND scol.cdefault = syscom.id) WHERE so.id = {
+                            id
+                        } AND so.xtype = 'u' AND stype.xusertype != 256 ORDER BY scol.colorder";
                 else
                     cmd.CommandText =
-                        $@"SELECT scol.name, stype.name, CASE stype.name WHEN 'decimal' THEN CAST(scol.xprec AS VARCHAR)+','+CAST(scol.xscale AS VARCHAR) ELSE CAST(scol.length AS VARCHAR) END, CAST((CASE WHEN scol.status = 128 THEN 1 ELSE 0 END) AS BIT) AS ""IsIdentity"", '', CAST(scol.isnullable AS BIT), '' AS ""DefaultValue"" FROM sysobjects so JOIN syscolumns scol ON (so.id = scol.id) JOIN systypes stype ON (scol.xtype = stype.xusertype) WHERE so.name = '{
-                            name
-                        }' AND so.xtype = 'u' AND stype.xusertype != 256 ORDER BY scol.colorder";
+                        $@"SELECT scol.name, stype.name, CASE stype.name WHEN 'decimal' THEN CAST(scol.xprec AS VARCHAR)+','+CAST(scol.xscale AS VARCHAR) ELSE CAST(scol.length AS VARCHAR) END, CAST((CASE WHEN scol.status = 128 THEN 1 ELSE 0 END) AS BIT) AS ""IsIdentity"", '', CAST(scol.isnullable AS BIT), '' AS ""DefaultValue"" FROM sysobjects so JOIN syscolumns scol ON (so.id = scol.id) JOIN systypes stype ON (scol.xtype = stype.xusertype) WHERE so.id = {
+                            id
+                        } AND so.xtype = 'u' AND stype.xusertype != 256 ORDER BY scol.colorder";
                 using (var rdr = cmd.ExecuteReader())
                 {
                     while (rdr.Read())

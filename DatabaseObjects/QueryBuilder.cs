@@ -197,7 +197,7 @@ namespace SqlQueryTool.DatabaseObjects
             public static string GetTableListWithRowCounts()
             {
                 return string.Format(
-                    "SELECT DISTINCT{0}\tt.name \"Table\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.partitions p ON (t.object_id = p.object_id AND p.index_id < 2){0}WHERE{0}\tt.is_ms_shipped = 0{0}ORDER BY{0}\tt.name",
+                    "SELECT DISTINCT{0}\ts.name \"Schema\",{0}\tt.name \"Table\",{0}\tt.object_id \"Id\",{0}\tp.rows \"Rows\"{0}FROM {0}\tsys.tables t{0}INNER JOIN{0}\tsys.schemas s ON (t.schema_id = s.schema_id){0}INNER JOIN{0}\tsys.partitions p ON (t.object_id = p.object_id AND p.index_id < 2){0}WHERE{0}\tt.is_ms_shipped = 0{0}",
                     Environment.NewLine);
             }
 

@@ -57,8 +57,10 @@ namespace SqlQueryTool.Forms
                 cmd.CommandText = QueryBuilder.SystemQueries.GetTableListWithRowCounts();
                 using (var rdr = cmd.ExecuteReader())
                 {
-                    while (rdr.Read()) tables.Add(new TableInfo {Name = rdr.GetString(0), RowCount = rdr.GetInt64(1)});
+                    while (rdr.Read()) tables.Add(new TableInfo {Schema = rdr.GetString(0), Name = rdr.GetString(1), Id = rdr.GetInt32(2), RowCount = rdr.GetInt64(3)});
                 }
+
+                tables = tables.OrderBy(t => t.NameWithNonDefaultSchema).ToList();
 
                 try
                 {
@@ -113,14 +115,15 @@ namespace SqlQueryTool.Forms
                     ContextMenuStrip = cmnTableCommandsGlobal
                 };
                 foreach (var tableInfo in
-                    tables.Where(t => t.Name.ToLower().Contains(filterText) && t.RowCount >= Settings_MinimumRowCount))
+                    tables.Where(t => t.NameWithNonDefaultSchema.ToLower().Contains(filterText) && t.RowCount >= Settings_MinimumRowCount))
                     tablesRootNode.Nodes.Add(new TreeNode
                     {
-                        Name = tableInfo.Name,
+                        Name = tableInfo.NameWithNonDefaultSchema,
                         Text = tableInfo.RowCount < int.MaxValue
-                            ? $"{tableInfo.Name} ({tableInfo.RowCount})"
-                            : tableInfo.Name,
-                        ContextMenuStrip = cmnTableCommands
+                            ? $"{tableInfo.NameWithNonDefaultSchema} ({tableInfo.RowCount})"
+                            : tableInfo.NameWithNonDefaultSchema,
+                        ContextMenuStrip = cmnTableCommands,
+                        Tag = tableInfo.Id
                     });
                 trvDatabaseObjects.Nodes.Add(tablesRootNode);
             }
@@ -161,9 +164,9 @@ namespace SqlQueryTool.Forms
             trvDatabaseObjects.SelectedNode = trvDatabaseObjects.Nodes["Tables"];
         }
 
-        private void BuildTableFieldsOverview(string tableName)
+        private void BuildTableFieldsOverview(string tableName, long id)
         {
-            var table = new TableDefinition(tableName, currentConnectionData);
+            var table = new TableDefinition(tableName, id, currentConnectionData);
             splDatabaseObjects.Panel2Collapsed = false;
 
             dgvTableFields.SuspendLayout();
@@ -279,7 +282,7 @@ namespace SqlQueryTool.Forms
             if (trvDatabaseObjects.SelectedNode != null && trvDatabaseObjects.SelectedNode.Parent != null &&
                 trvDatabaseObjects.SelectedNode.Parent.Name == "Tables")
             {
-                BuildTableFieldsOverview(trvDatabaseObjects.SelectedNode.Name);
+                BuildTableFieldsOverview(trvDatabaseObjects.SelectedNode.Name, (long)trvDatabaseObjects.SelectedNode.Tag);
                 trvDatabaseObjects.SelectedNode.EnsureVisible();
             }
             else
@@ -300,13 +303,13 @@ namespace SqlQueryTool.Forms
                 var nodeName = trvDatabaseObjects.SelectedNode.Name;
                 if (trvDatabaseObjects.SelectedNode.Parent.Name == "Tables")
                     OnNewQueryInitiated(nodeName,
-                        new TableDefinition(nodeName, currentConnectionData).BuildSelectQuery(QueryBuilder
+                        new TableDefinition(nodeName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildSelectQuery(QueryBuilder
                             .TableSelectLimit.None));
                 else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Procs")
                     OnNewQueryInitiated(nodeName, procs.Single(p => p.Name == nodeName).Content);
                 else if (trvDatabaseObjects.SelectedNode.Parent.Name == "Views")
                     OnNewQueryInitiated(nodeName,
-                        new TableDefinition(nodeName, currentConnectionData).BuildSelectQuery(QueryBuilder
+                        new TableDefinition(nodeName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildSelectQuery(QueryBuilder
                             .TableSelectLimit.None));
             }
         }
@@ -327,7 +330,7 @@ namespace SqlQueryTool.Forms
             var node = trvDatabaseObjects.GetHoverNode(e.X, e.Y);
 
             var values = e.Data.GetData(typeof(List<SqlCellValue>)) as List<SqlCellValue>;
-            var targetTable = new TableDefinition(node.Name, currentConnectionData);
+            var targetTable = new TableDefinition(node.Name, (long)node.Tag, currentConnectionData);
             var specimenValue = values.First();  
             
             OnNewQueryInitiated(node.Name,
@@ -374,7 +377,7 @@ namespace SqlQueryTool.Forms
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated(tableName,
-                new TableDefinition(tableName, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
                     .None));
         }
 
@@ -388,7 +391,7 @@ namespace SqlQueryTool.Forms
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated(tableName,
-                new TableDefinition(tableName, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
                     .LimitTop));
         }
 
@@ -396,7 +399,7 @@ namespace SqlQueryTool.Forms
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated(tableName,
-                new TableDefinition(tableName, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildSelectQuery(QueryBuilder.TableSelectLimit
                     .LimitBottom));
         }
 
@@ -404,21 +407,21 @@ namespace SqlQueryTool.Forms
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated($"{tableName} (i)",
-                new TableDefinition(tableName, currentConnectionData).BuildInsertQuery());
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildInsertQuery());
         }
 
         private void mniCreateUpdateQuery_Click(object sender, EventArgs e)
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated($"{tableName} (u)",
-                new TableDefinition(tableName, currentConnectionData).BuildUpdateQuery());
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildUpdateQuery());
         }
 
         private void mniCreateDeleteQuery_Click(object sender, EventArgs e)
         {
             var tableName = trvDatabaseObjects.SelectedNode.Name;
             OnNewQueryInitiated($"{tableName} (d)",
-                new TableDefinition(tableName, currentConnectionData).BuildDeleteQuery());
+                new TableDefinition(tableName, (long)trvDatabaseObjects.SelectedNode.Tag, currentConnectionData).BuildDeleteQuery());
         }
 
         private void mniShowViewDefinition_Click(object sender, EventArgs e)
@@ -440,8 +443,11 @@ namespace SqlQueryTool.Forms
 
         private class TableInfo
         {
+            public long Id { get; set; }
+            public string Schema { get; set; }
             public string Name { get; set; }
             public long RowCount { get; set; }
+            public string NameWithNonDefaultSchema => Schema == "dbo" ? Name : $"{Schema}.{Name}";
         }
 
         private class StoredProc
